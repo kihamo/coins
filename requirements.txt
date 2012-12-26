@@ -1,0 +1,6 @@
+Django>=1.4
+django-admin-tools>=0.4.1
+django-database-storage>=0.1.2
+pil>=1.1.6
+reportlab>=2.6
+South>=0.7.6

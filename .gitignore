@@ -1,0 +1,5 @@
+.idea
+*.pyc
+*.mo
+coinscollection/data/coins.db
+coinscollection/static/*

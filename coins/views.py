@@ -3,7 +3,7 @@ from django.http import Http404
 
 from models import Coin
 
-from reportlab.lib.utils import ImageReader
+from PIL import Image
 from reportlab.graphics.barcode import createBarcodeDrawing
 
 from coins.utils.storage import DatabaseStorage
@@ -14,25 +14,23 @@ def image_view(request, filename, format='jpg', width=None, height=None):
     if not file:
         raise Http404
 
-    image = ImageReader(file)
+    format = format.upper()
 
-    print image
+    if format == 'JPG':
+        format = 'JPEG'
 
-    if format == 'jpeg':
-        format = 'jpg'
+    thumb = Image.open(file)
 
-    response = HttpResponse(mimetype = 'image/%s' % format)
+    if thumb.format == 'PNG' and format != thumb.format:
+        imageWhiteBg = Image.new('RGB', thumb.size, (255,255,255))
+        imageWhiteBg.paste(thumb, thumb)
+        thumb = imageWhiteBg
 
-    #content_type, content_encoding = mimetypes.guess_type(filename)
-    #thumb = Image.open(image_file)
-    #if
+    if width and height:
+        thumb.thumbnail((int(width), int(height)), Image.ANTIALIAS)
 
-    #if width and height:
-    #    thumb = Image.open(image_file)
-    #    thumb.thumbnail((int(width), int(height)), Image.ANTIALIAS)
-    #    thumb.save(response, 'PNG')
-    #else:
-    #    response.content = image_file.read()
+    response = HttpResponse(mimetype = Image.MIME[format])
+    thumb.save(response, format)
 
     return response
 

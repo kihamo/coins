@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.contrib import admin
 from django.forms import ModelForm
 
+from utils.widgets import AdminImageFileWidget
 from views import barcode_view
 from models import *
 
@@ -52,6 +53,12 @@ class CoinInline(admin.StackedInline):
             'fields': ('features',)
         })
     )
+
+    formfield_overrides = {
+        models.ImageField: {
+            'widget': AdminImageFileWidget
+        },
+    }
 
     def _show_barcode_image(self, model, type):
         if not model.id or not model.issue:

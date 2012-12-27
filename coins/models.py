@@ -1,13 +1,10 @@
 # django-tastypie REST Django
 # http://www.falshivok.net/numismatics/Benin/35 coins params
 
-
-from hashlib import md5
-
 from django.db import models
-from django.db.models.fields.files import ImageFieldFile
-
 from django.utils.translation import ugettext_lazy as _
+
+from coins.utils.models import CoinImageField
 
 # -------- Service models --------
 class CoinAbstract(models.Model):
@@ -21,51 +18,34 @@ class CoinAbstract(models.Model):
         return '%s object' % self.__class__.__name__
 
 class Image(CoinAbstract):
-    filename = models.CharField(max_length=256)
+    hash = models.CharField(
+        editable = False,
+        max_length = 32,
+        primary_key = True,
+        unique = True
+    )
 
-    data = models.TextField()
+    filename = models.CharField(
+        max_length=256
+    )
+
+    data = models.TextField(
+        editable=False
+    )
+
     size = models.PositiveIntegerField(
         editable=False
     )
 
-    #mimetype = models.CharField(
-    #    null=True,
-    #    blank=True,
-    #    editable=False,
-    #    max_length=50
-    #)
-    #hash = models.CharField(editable=False,max_length=32)
+    mime_type = models.CharField(
+        null=True,
+        blank=True,
+        editable=False,
+        max_length=50
+    )
 
     def resize(self, width=None, height=None):
         pass
-
-class CoinImageFieldFile(ImageFieldFile):
-
-    def save(self, name, content, save=True):
-        position = content.tell()
-        content.seek(0)
-
-        name = md5(content.read()).hexdigest()
-
-        content.seek(position)
-
-        super(CoinImageFieldFile, self).save(name, content, save)
-
-class CoinImageField(models.ImageField):
-    attr_class = CoinImageFieldFile
-
-    def __init__(self, *args, **kwargs):
-        from coins.utils.storage import DatabaseStorage
-
-        kwargs['upload_to'] = 'coins'
-        kwargs['blank'] = True
-        kwargs['null'] = True
-        kwargs['storage'] = DatabaseStorage()
-
-        super(CoinImageField, self).__init__(*args, **kwargs)
-
-    def generate_filename(self, instance, name):
-        return name
 
 # -------- Models --------
 
@@ -311,10 +291,16 @@ class Coin(CoinAbstract):
         null=True
     )
     image_obverse = CoinImageField(
-        _('Obverse')
+        _('Obverse'),
+        thumb_width=200,
+        thumb_height=200,
+        thumb_format='png'
     )
     image_reverse = CoinImageField(
-        _('Reverse')
+        _('Reverse'),
+        thumb_width=200,
+        thumb_height=200,
+        thumb_format='png'
     )
     in_album = models.BooleanField(
         _('In albums'),

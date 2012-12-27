@@ -78,6 +78,12 @@ class Currency(CoinAbstract):
         verbose_name = _('currency')
         verbose_name_plural = _('currencies')
 
+    def __unicode__(self):
+        if self.sign and len(self.sign):
+            return '%s (%s)' % (self.name, self.sign)
+
+        return self.name
+
 class Country(CoinAbstract):
     iso = models.CharField(
         _('ISO code'),

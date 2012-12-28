@@ -42,7 +42,7 @@ class CoinInline(admin.StackedInline):
     fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('barcode', 'qr_code', 'collection', 'mint', 'mint_mark', 'grade', 'in_album', 'packaged')
+            'fields': ('barcode', 'qr_code', 'collection', 'mint', 'mint_mark', 'grade', 'in_album', 'packaged', 'booked')
         }),
         (None, {
             'classes': ('wide',),
@@ -79,7 +79,7 @@ class CoinCollectionInline(CoinInline):
     fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('barcode', 'qr_code', 'issue', 'collection', 'mint', 'mint_mark', 'grade', 'in_album', 'packaged')
+            'fields': ('barcode', 'qr_code', 'issue', 'collection', 'mint', 'mint_mark', 'grade', 'in_album', 'packaged', 'booked')
         }),
         (None, {
             'classes': ('wide',),
@@ -126,7 +126,7 @@ class IssueAdminForm(ModelForm):
         super(IssueAdminForm, self).__init__(*args, **kwargs)
 
 class IssueAdmin(admin.ModelAdmin):
-    list_display = ('series', 'name', 'show_nominal', 'year', 'coins_count')
+    list_display = ('series', 'name', 'show_nominal', 'year', 'coins_count', 'coins_booked_count')
     list_display_links = ('name',)
     search_fields = ['name']
     inlines = (CoinInline,)
@@ -182,8 +182,9 @@ class IssueAdmin(admin.ModelAdmin):
 
 
 class CoinAdmin(admin.ModelAdmin):
-    list_display = ('issue', 'mint', 'in_album', 'packaged')
-    list_editable = ('in_album', 'packaged')
+    list_display = ('issue', 'mint', 'in_album', 'packaged', 'booked')
+    list_editable = ('in_album', 'packaged', 'booked')
+    list_filter = ('in_album', 'packaged', 'booked')
 
     formfield_overrides = {
         models.ImageField: {

@@ -271,6 +271,10 @@ class Issue(CoinAbstract):
         return self.coin_set.count()
     coins_count.short_description = _('Coins count')
 
+    def coins_booked_count(self):
+        return self.coin_set.filter(booked=True).count()
+    coins_booked_count.short_description = _('Booked coins count')
+
 class Coin(CoinAbstract):
     issue = models.ForeignKey(
         Issue,
@@ -315,6 +319,10 @@ class Coin(CoinAbstract):
     packaged = models.BooleanField(
         _('Packaged'),
         help_text=_('Labeled and packaged')
+    )
+    booked = models.BooleanField(
+        _('Booked'),
+        help_text=_('Coin is booked')
     )
     features = models.TextField(
         _('Features'),

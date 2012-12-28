@@ -4,11 +4,15 @@ import views
 
 urlpatterns = patterns('',
     url(
-        r'^image\/(?P<filename>.+?)([.](?P<width>\d+)x(?P<height>\d+))?[.](?P<format>(jpg|jpeg|png|gif))$',
-        views.image_view
+        r'^image\/(.+?)(?:[.](\d+)x(\d+))?(?:[.](jpg|jpeg|png|gif))?$',
+        views.image
     ),
     url(
-        r'^barcode\/(?P<coin_id>\d+)([.](?P<barcode_format>(qr|code128)))?[.](?P<image_format>(jpg|jpeg|png|gif))$',
-        views.barcode_view
+        r'^barcode\/(\d+)(?:[.](qr|code128))?(?:[.](jpg|jpeg|png|gif))?$',
+        views.barcode
+    ),
+    url(
+        r'^box\/(\d+)(?:[.](html|pdf))?$',
+        views.box
     ),
 )

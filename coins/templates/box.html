@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta charset="utf-8">
+<style type="text/css">
+    body{margin:0;padding:0;}
+    canvas{margin:0;padding:0}
+    canvas:nth-child(odd){float:left}
+    canvas:nth-child(even){margin-left:-1px}
+    canvas:nth-child(n+3){margin-top:-5px}
+</style>
+<script type="text/javascript">
+function extDrawLine(points)
+{
+    if(!points || points.length < 2) {
+        return;
+    }
+
+    this.beginPath();
+
+    for(i = 0; i < points.length; i++) {
+        if(points[i].length != 2) {
+            continue;
+        }
+
+        if(!points[i+1]) {
+            this.lineTo(points[i][0], points[i][1]);
+            continue;
+        }
+
+        var x1 = points[i][0], y1 = points[i][1];
+
+        // http://diveintohtml5.info/canvas.html#paths
+        if(x1 == points[i+1][0] && (x1 == 0 || x1 == this.canvas.width)) {
+            x1 = points[i+1][0] = x1 != 0 ? x1 - this.lineWidth / 2 :  this.lineWidth / 2;
+        }
+
+        if(y1 == points[i+1][1] && (y1 == 0 || y1 == this.canvas.height)) {
+            y1 = points[i+1][1] = y1 != 0 ? y1 - this.lineWidth / 2 :  this.lineWidth / 2;
+        }
+
+        var x2 = points[i+1][0], y2 = points[i+1][1];
+
+        switch (this.extLineStyle) {
+            // http://stackoverflow.com/questions/4576724/dotted-stroke-in-canvas
+            case 'dashed':
+                var dashArray = !this.extDashArray ? [3, 3] : this.extDashArray;
+                var dashCount = dashArray.length;
+
+                this.save();
+
+                var dx = x2-x1, dy = y2-y1;
+                var distRemaining = Math.sqrt(dx*dx + dy*dy);
+
+                var rot = Math.atan2(dy, dx);
+                var index = 0, draw = true;
+
+                this.translate(x1, y1);
+                this.moveTo(0, 0);
+                this.rotate(rot);
+
+                x = 0;
+                while (distRemaining > x) {
+                    x += dashArray[index++ % dashCount];
+                    if (x > distRemaining) {
+                        x = distRemaining;
+                    }
+
+                    draw ? this.lineTo(x, 0): this.moveTo(x, 0);
+                    draw = !draw;
+                }
+
+                this.restore();
+                break;
+
+            case 'solid':
+            default:
+                this[i == 0 ? 'moveTo' : 'lineTo'](x1, y1);
+        }
+    }
+
+    this.stroke();
+}
+
+function extDrawImage(url, x, y, w, h)
+{
+    var image = new Image();
+    image._extContext = this;
+    image._extArgs = arguments;
+    image.onload = function() {
+        this._extContext.drawImage(
+                this,
+                this._extArgs[1] == undefined ? 0 : this._extArgs[1],
+                this._extArgs[2] == undefined ? 0 : this._extArgs[2],
+                this._extArgs[3] == undefined ? this.width : this._extArgs[3],
+                this._extArgs[4] == undefined ? this.height : this._extArgs[4]
+        );
+    };
+    image.src = url;
+}
+
+function draw() {
+    var el = document.getElementsByTagName('canvas');
+    if(!el.length || !el[0].getContext) {
+        return;
+    }
+
+    var canvasRenderingContext2D = window.CanvasRenderingContext2D && CanvasRenderingContext2D.prototype;
+    if(!canvasRenderingContext2D) {
+        return;
+    }
+    canvasRenderingContext2D.extDrawLine = extDrawLine;
+    canvasRenderingContext2D.extDrawImage = extDrawImage;
+
+    // 1 сантиметр в пикселях
+    var cmElement = document.createElement('div');
+    cmElement.style.width = '1cm';
+    cmElement.style.display = 'none';
+    document.body.appendChild(cmElement);
+    var cm = Math.round(parseFloat(getComputedStyle(cmElement).width));
+    document.body.removeChild(cmElement);
+
+    var lineWidth = 2;
+    var markLength = 10;
+    var markMillimeterLength = 7;
+    var markCentimetreLength = 10;
+    var topHeight = 4.5*cm;
+    var middleHeight = 5*cm;
+    var bottomHeight = 2*cm; // избавляемся от погрешности при округлении
+    var quarter = 2.5*cm;
+    var width = quarter*4, height = topHeight + middleHeight + bottomHeight;
+
+    var cacheCanvas = null;
+    document.body.style.width = width * 2 + 'px';
+
+    for(i in el) {
+        if(!el[i].getContext) {
+            continue;
+        }
+
+        var e = el[i];
+        var c = e.getContext('2d');
+
+        e.setAttribute('width', width);
+        e.setAttribute('height', height);
+        c.lineWidth = lineWidth;
+
+        c.fillStyle = 'rgba(0,0,0,0.9)';
+        c.strokeStyle = 'rgba(0,0,0,0.9)';
+
+        c.save();
+
+        if(cacheCanvas) {
+            c.drawImage(cacheCanvas, 0, 0);
+        }
+        else {
+            c.globalCompositeOperation = 'destination-atop';
+
+            // отметки для резки
+            c.extDrawLine([[markLength,0],[0,0],[0,markLength]]);
+            c.extDrawLine([[0,height-markLength],[0,height],[markLength,height]]);
+            c.extDrawLine([[width-markLength,0],[width,0],[width,markLength]]);
+            c.extDrawLine([[width,height-markLength],[width,height],[width-markLength,height]]);
+
+            // скелет
+            c.extLineStyle = 'dashed';
+            //c.extDrawLine([[quarter,topHeight],[width-quarter,topHeight]]);
+            //c.extDrawLine([[quarter,height-bottomHeight],[width-quarter,height-bottomHeight]]);
+            //c.extDrawLine([[quarter,0],[quarter,height]]);
+            //c.extDrawLine([[width-quarter,0],[width-quarter,height]]);
+
+            c.extDrawLine([[quarter,height-bottomHeight],[quarter - .7*cm,height]]);
+            c.extDrawLine([[width-quarter,height-bottomHeight],[width-quarter + .7*cm,height]]);
+            c.extLineStyle = null;
+
+            // линейка
+            var cuts = [0];
+            index = .5;
+            while(index < middleHeight / 2 / cm) {
+                cuts.push(index);
+                cuts.push(-index);
+                index += .5;
+            }
+
+            c.translate(width/2, topHeight+middleHeight/2);
+            for(index in cuts) {
+                var cut = cuts[index];
+                var cutLength = cut % 1 == 0 ? markCentimetreLength : markMillimeterLength;
+
+                c.extDrawLine([[-quarter,cut*cm],[-quarter+cutLength,cut*cm]]);
+                c.extDrawLine([[quarter,cut*cm],[quarter-cutLength,cut*cm]]);
+                c.extDrawLine([[cut*cm,-middleHeight/2],[cut*cm,-middleHeight/2+cutLength]]);
+                c.extDrawLine([[cut*cm,middleHeight/2],[cut*cm,middleHeight/2-cutLength]]);
+            }
+            c.restore();
+
+            cacheCanvas = c.canvas;
+        }
+
+        // название
+        if(e.dataset['title'].length) {
+            c.font = 'bold .35cm sans-serif';
+            c.textAlign = 'center';
+
+            var maxWidthLine = quarter*2-10;
+            var currentWidthLine = c.measureText(e.dataset['title']).width;
+            var lineHeight = .35*cm;
+            var marginTopTitle = lineHeight;
+            var marginLeftTitle = quarter*2 +5;
+
+            if(currentWidthLine > maxWidthLine) {
+                var words = e.dataset['title'].split(' ');
+                var countWords = words.length;
+                var line = '';
+
+                for (var i = 0; i < countWords; i++) {
+                    var testLine = line + words[i] + ' ';
+                    var testWidthLine = c.measureText(testLine).width;
+
+                    if (testWidthLine > maxWidthLine) {
+                        c.fillText(line, marginLeftTitle, marginTopTitle, maxWidthLine);
+                        line = words[i] + ' ';
+                        marginTopTitle += lineHeight;
+                    }
+                    else {
+                        line = testLine;
+                    }
+                }
+
+                c.fillText(line, marginLeftTitle, marginTopTitle, maxWidthLine);
+            }
+            else {
+                c.fillText(e.dataset['title'], marginLeftTitle, marginTopTitle, maxWidthLine);
+            }
+        }
+
+        // штрих коды
+        c.extDrawImage(e.dataset['qr'], quarter+5, topHeight-5-2.5*cm -.5*cm, 2.5*cm,2.5*cm);
+        c.extDrawImage(e.dataset['barcode'], quarter, topHeight-0.5*cm, width/2, 0.5*cm);
+
+        // изображение аверса/реверса
+        if(e.dataset['image']) {
+            var coinDiameter = parseFloat(e.dataset['diameter']) || 40;
+            coinDiameter *= .1 * cm;
+
+            c.extDrawImage(
+                    e.dataset['image'],
+                    width/2-coinDiameter/2, topHeight+middleHeight/2-coinDiameter/2,
+                    coinDiameter, coinDiameter
+            );
+        }
+
+        c.restore();
+    }
+}
+
+window.onload = function () {
+    draw();
+}
+</script>
+</head>
+<body>
+<canvas
+        data-diameter="{{ coin.issue.diameter }}"
+{% comment %}
+        data-qr="{% url coins.views.barcode coin.id 'qr' 'png' %}"
+        {% endcomment %}
+        data-barcode="{% url coins.views.barcode coin.id 'code128' 'png' %}"
+
+        data-image="{{ coin.image_reverse.url }}"
+        data-title="{{ coin.issue.name }}"
+></canvas>
+
+</body>
+</html>

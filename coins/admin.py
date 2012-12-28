@@ -9,7 +9,7 @@ from django.contrib import admin
 from django.forms import ModelForm
 
 from utils.widgets import AdminImageFileWidget
-from views import barcode_view
+from views import barcode as barcode_view
 from models import *
 
 # -------- Actions --------
@@ -64,16 +64,7 @@ class CoinInline(admin.StackedInline):
         if not model.id or not model.issue:
             return ''
 
-        meta = model.issue._meta
-        url = reverse('admin:%s_%s_barcode' % (
-            meta.app_label.lower(),
-            meta.module_name.lower()
-            ), kwargs={
-            'coin_id': model.id,
-            'barcode_format': type,
-            'image_format': 'jpeg'
-        })
-
+        url = reverse(barcode_view, args=[model.id, type])
         return '<img src="%s" alt="%s"/>' % (url, ugettext('Coin barcode'))
 
     def barcode(self, coin):
@@ -135,7 +126,7 @@ class IssueAdminForm(ModelForm):
         super(IssueAdminForm, self).__init__(*args, **kwargs)
 
 class IssueAdmin(admin.ModelAdmin):
-    list_display = ('series', 'name', 'nominal', 'year', 'coins_count')
+    list_display = ('series', 'name', 'show_nominal', 'year', 'coins_count')
     list_display_links = ('name',)
     search_fields = ['name']
     inlines = (CoinInline,)
@@ -182,28 +173,30 @@ class IssueAdmin(admin.ModelAdmin):
         http://127.0.0.1:8000/admin/coins/coin/barcode/1.qr.png
         '''
 
-        urls = super(IssueAdmin, self).get_urls()
-
-        extend_urls = patterns('',
+        return super(IssueAdmin, self).get_urls() + patterns('',
             url(
-                r'^barcode\/(?P<coin_id>\d+)[.](?P<barcode_format>(qr|code128))[.](?P<image_format>(jpg|jpeg|png|gif))$',
-                barcode_view,
-                name='%s_%s_barcode' % (
-                    self.model._meta.app_label.lower(),
-                    self.model._meta.module_name.lower()
-                )
+                r'^barcode\/(\d+)[.](?:(qr|code128))[.]png$',
+                barcode_view
             ),
         )
 
-        return extend_urls + urls
 
+class CoinAdmin(admin.ModelAdmin):
+    list_display = ('issue', 'mint', 'in_album', 'packaged')
+    list_editable = ('in_album', 'packaged')
+
+    formfield_overrides = {
+        models.ImageField: {
+            'widget': AdminImageFileWidget
+        },
+    }
 
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Currency, CurrencyAdmin)
 admin.site.register(Issue, IssueAdmin)
 admin.site.register(Mint, MintAdmin)
+admin.site.register(Coin, CoinAdmin)
 
 admin.site.register(MintMark)
 admin.site.register(Series)
-admin.site.register(Coin)

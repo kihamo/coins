@@ -158,7 +158,7 @@ class Series(CoinAbstract):
     name = models.CharField(
         _('Name'),
         help_text=_('Series name'),
-        max_length=100
+        max_length=200
     )
 
     class Meta(CoinAbstract.Meta):
@@ -173,7 +173,7 @@ class Issue(CoinAbstract):
 
     name = models.CharField(
         _('Name'),
-        max_length=100,
+        max_length=200,
         help_text=_('Issue name')
     )
     type = models.PositiveSmallIntegerField(
@@ -327,7 +327,7 @@ class Coin(CoinAbstract):
         verbose_name_plural = _('coins')
 
     def get_absolute_url(self):
-        return "/coin/%i/" % self.id
+        return "/coin/%s/" % self.barcode
 
     @property
     def barcode(self):
@@ -363,3 +363,9 @@ class Coin(CoinAbstract):
 
     def __unicode__(self):
         return self.issue.name
+
+    def save(self):
+        if self.in_album and not self.packaged:
+            self.packaged = True
+
+        super(Coin, self).save()

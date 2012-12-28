@@ -1,27 +1,32 @@
-from django.http import HttpResponse
-from django.http import Http404
+from django.shortcuts import render_to_response
+from django.http import HttpResponse, Http404
 
 from models import Coin
 
 from PIL import Image
 from reportlab.graphics.barcode import createBarcodeDrawing
 
+from coins.utils.box import Box
+
 from coins.utils.storage import DatabaseStorage
 
 # http://obroll.com/install-python-pil-python-image-library-on-ubuntu-11-10-oneiric/
-def image_view(request, filename, format='jpg', width=None, height=None):
+def image(request, filename, width=None, height=None, image_format='png'):
     file = DatabaseStorage().open(filename, 'rb')
     if not file:
         raise Http404
 
-    format = format.upper()
+    if not image_format or image_format.upper() not in ('PNG', 'JPEG', 'JPG', 'GIF'):
+        image_format = 'PNG'
+    else:
+        image_format = image_format.upper()
 
-    if format == 'JPG':
-        format = 'JPEG'
+        if image_format == 'JPG':
+            image_format = 'JPEG'
 
     thumb = Image.open(file)
 
-    if thumb.format == 'PNG' and format != thumb.format:
+    if thumb.format == 'PNG' and image_format != thumb.format:
         imageWhiteBg = Image.new('RGB', thumb.size, (255,255,255))
         imageWhiteBg.paste(thumb, thumb)
         thumb = imageWhiteBg
@@ -29,12 +34,12 @@ def image_view(request, filename, format='jpg', width=None, height=None):
     if width and height:
         thumb.thumbnail((int(width), int(height)), Image.ANTIALIAS)
 
-    response = HttpResponse(mimetype = Image.MIME[format])
-    thumb.save(response, format)
+    response = HttpResponse(mimetype = Image.MIME[image_format])
+    thumb.save(response, image_format)
 
     return response
 
-def barcode_view(request, coin_id, barcode_format, image_format):
+def barcode(request, coin_id, barcode_format='code128', image_format='png'):
     try:
         coin = Coin.objects.get(pk = coin_id)
     except Coin.DoesNotExist:
@@ -42,6 +47,8 @@ def barcode_view(request, coin_id, barcode_format, image_format):
 
     if image_format == 'jpeg':
         image_format = 'jpg'
+    elif image_format not in ('png', 'jpg', 'gif'):
+        image_format = 'png'
 
     if barcode_format == 'qr':
         barcode = createBarcodeDrawing(
@@ -55,7 +62,8 @@ def barcode_view(request, coin_id, barcode_format, image_format):
         barcode = createBarcodeDrawing(
             'Code128',
             value = str(coin.barcode),
-            barWidth = 1
+            barWidth = 1,
+            quiet = False
         )
 
     return HttpResponse(
@@ -63,6 +71,22 @@ def barcode_view(request, coin_id, barcode_format, image_format):
         mimetype = 'image/%s' % image_format
     )
 
-def box_list(request):
+def box(request, coin_id, view_format = 'html'):
+    try:
+        coin = Coin.objects.get(pk = coin_id)
+    except Coin.DoesNotExist:
+        raise Http404
 
-    return HttpResponse()
+    if view_format not in ('html', 'pdf'):
+        view_format = 'html'
+
+
+    if view_format == 'html':
+        return render_to_response('box.html', {'coin': coin})
+
+    response = HttpResponse(mimetype='application/pdf')
+
+    box = Box(coin)
+    box.draw(response)
+
+    return response

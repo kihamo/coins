@@ -1,7 +1,7 @@
 import time
 
 
-from reportlab.platypus import BaseDocTemplate, Paragraph, Spacer, Image, Frame, PageTemplate
+from reportlab.platypus import BaseDocTemplate, Paragraph, Frame, PageTemplate
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 
@@ -34,15 +34,13 @@ class Box():
                               topMargin=.5*cm, bottomMargin=.5*cm, _debug = 1)
         page_width, page_height = landscape(A4)
 
-        elements = []
-        elements.append(Paragraph(self.coin.issue.name, self.styles.get('Justify')))
+        elements = [Paragraph(self.coin.issue.name, self.styles.get('Justify'))]
 
 
         box = Frame(10, page_height + 10, 10*cm, 11.7*cm, showBoundary=1)
 
 
-        boxes = []
-        boxes.append(box)
+        boxes = [box]
 
         doc.addPageTemplates(PageTemplate(frames = boxes))
 

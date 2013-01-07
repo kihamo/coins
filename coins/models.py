@@ -185,7 +185,7 @@ class Issue(CoinAbstract):
     )
     nominal = models.DecimalField(
         _('Nominal'),
-        max_digits=5,
+        max_digits=10,
         decimal_places=2
     )
     currency = models.ForeignKey(
@@ -218,23 +218,36 @@ class Issue(CoinAbstract):
         _('Catalog number'),
         max_length=100,
         blank=True,
-        null=True
+        null=True,
+        editable=False
     )
-    diameter = models.IntegerField(
+    diameter = models.DecimalField(
         _('Diameter'),
         help_text=_('Diameter in millimeters'),
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    alloy = models.CharField(
+        _('Alloy'),
+        max_length=200,
         blank=True,
         null=True
     )
-    thickness = models.FloatField(
+    thickness = models.DecimalField(
         _('Thickness'),
         help_text=_('Thickness in millimeters'),
+        max_digits=10,
+        decimal_places=2,
         blank=True,
         null=True
     )
-    weight = models.IntegerField(
+    weight = models.DecimalField(
         _('Weight'),
         help_text=_('Weight in grams'),
+        max_digits=10,
+        decimal_places=2,
         blank=True,
         null=True
     )
@@ -244,9 +257,25 @@ class Issue(CoinAbstract):
         blank=True,
         null=True
     )
+    desc = models.TextField(
+        _('Description'),
+        help_text=_('Coin description'),
+        blank=True,
+        null=True
+    )
+    image_obverse = CoinImageField(
+        _('Obverse'),
+        blank=True,
+        null=True
+    )
     desc_obverse = models.TextField(
         _('Obverse'),
         help_text=_('Obverse description'),
+        blank=True,
+        null=True
+    )
+    image_reverse = CoinImageField(
+        _('Reverse'),
         blank=True,
         null=True
     )
@@ -302,15 +331,13 @@ class Coin(CoinAbstract):
     )
     image_obverse = CoinImageField(
         _('Obverse'),
-        thumb_width=200,
-        thumb_height=200,
-        thumb_format='png'
+        blank=True,
+        null=True
     )
     image_reverse = CoinImageField(
         _('Reverse'),
-        thumb_width=200,
-        thumb_height=200,
-        thumb_format='png'
+        blank=True,
+        null=True
     )
     in_album = models.BooleanField(
         _('In albums'),
@@ -372,8 +399,8 @@ class Coin(CoinAbstract):
     def __unicode__(self):
         return self.issue.name
 
-    def save(self):
+    def save(self, *args, **kwargs):
         if self.in_album and not self.packaged:
             self.packaged = True
 
-        super(Coin, self).save()
+        super(Coin, self).save(*args, **kwargs)

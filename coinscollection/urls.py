@@ -7,9 +7,10 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-
-       (r'^cp/', include(admin.site.urls)),
+    url(r'^cp/doc/', include('django.contrib.admindocs.urls')),
     url(r'^cp_tools/', include('admin_tools.urls')),
+    (r'^cp/', include(admin.site.urls)),
+
     url(r'^coins/', include('coins.urls')),
 
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

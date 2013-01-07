@@ -24,6 +24,15 @@ def print_boxes_all(modeladmin, request, queryset):
     pass
 print_boxes_all.short_description = _('Print coin boxes for all coins')
 
+# -------- Override --------
+class CoinAbstractModelAdmin(admin.ModelAdmin):
+    save_on_top = True
+    formfield_overrides = {
+        models.ImageField: {
+            'widget': AdminImageFileWidget
+        },
+    }
+
 # -------- Inline --------
 class CountryInline(admin.TabularInline):
     model = Country
@@ -92,24 +101,24 @@ class CoinCollectionInline(CoinInline):
     )
 
 # -------- General --------
-class CollectionAdmin(admin.ModelAdmin):
+class CollectionAdmin(CoinAbstractModelAdmin):
     list_display = ('name', 'coins_count')
     list_display_links = ('name',)
     inlines = (CoinCollectionInline,)
 
-class CountryAdmin(admin.ModelAdmin):
+class CountryAdmin(CoinAbstractModelAdmin):
     list_display = ('iso', 'name', 'currency')
     list_display_links = ('name',)
     search_fields = ['iso', 'name']
 
-class CurrencyAdmin(admin.ModelAdmin):
+class CurrencyAdmin(CoinAbstractModelAdmin):
     list_display = ('iso', 'name')
     list_display_links = ('name',)
     search_fields = ['iso', 'name']
     ordering = ['iso']
     inlines = (CountryInline,)
 
-class MintAdmin(admin.ModelAdmin):
+class MintAdmin(CoinAbstractModelAdmin):
     inlines = (MintMarkInline,)
 
 class IssueAdminForm(ModelForm):
@@ -125,14 +134,15 @@ class IssueAdminForm(ModelForm):
 
         super(IssueAdminForm, self).__init__(*args, **kwargs)
 
-class IssueAdmin(admin.ModelAdmin):
-    list_display = ('series', 'name', 'show_nominal', 'year', 'coins_count', 'coins_booked_count')
+class IssueAdmin(CoinAbstractModelAdmin):
+    list_display = ('show_image_reverse', 'name', 'show_nominal', 'year', 'coins_count', 'coins_booked_count')
     list_display_links = ('name',)
     search_fields = ['name']
     inlines = (CoinInline,)
     form = IssueAdminForm
-    list_filter = ('year',)
+    list_filter = ('type', 'year')
     actions = (print_boxes_not_packed, print_boxes_all)
+    readonly_fields = ('catalog_number',)
 
     fieldsets = (
         (_('Main information'), {
@@ -147,11 +157,11 @@ class IssueAdmin(admin.ModelAdmin):
         }),
         (_('Physical parameters'), {
             'classes': ('wide',),
-            'fields': ('diameter', 'thickness', 'weight', 'mintage')
+            'fields': ('alloy', 'diameter', 'thickness', 'weight', 'mintage')
         }),
         (_('Description'), {
             'classes': ('wide',),
-            'fields': ('desc_obverse', 'desc_reverse', 'desc_edge')
+            'fields': ('desc', 'image_obverse', 'desc_obverse', 'image_reverse', 'desc_reverse', 'desc_edge')
         }),
     )
 
@@ -164,14 +174,22 @@ class IssueAdmin(admin.ModelAdmin):
         return model.nominal
     show_nominal.short_description = _('Nominal')
 
+    def show_image_reverse(self, model):
+        if model.image_reverse:
+            return '<img src="%s" alt="%s" />' % (model.image_reverse.get_url(100, 100), model)
+
+        return ''
+    show_image_reverse.allow_tags = True
+    show_image_reverse.short_description = _('Reverse')
+
     def get_urls(self):
-        '''
+        """
         Добавляем URL на свой View в даминке, который в свою очередь подключается
         из фронта coins.views.barcode_view. Таким образом прозрачно заставляем
         работать одну вьюху и на фронт и на админку
 
         http://127.0.0.1:8000/admin/coins/coin/barcode/1.qr.png
-        '''
+        """
 
         return super(IssueAdmin, self).get_urls() + patterns('',
             url(
@@ -181,16 +199,25 @@ class IssueAdmin(admin.ModelAdmin):
         )
 
 
-class CoinAdmin(admin.ModelAdmin):
-    list_display = ('issue', 'mint', 'in_album', 'packaged', 'booked')
+class CoinAdmin(CoinAbstractModelAdmin):
+    list_display = ('issue', 'show_mint', 'in_album', 'packaged', 'booked')
     list_editable = ('in_album', 'packaged', 'booked')
     list_filter = ('in_album', 'packaged', 'booked')
+    search_fields = ('issue__name',)
+    actions = (print_boxes_not_packed, print_boxes_all)
 
     formfield_overrides = {
         models.ImageField: {
             'widget': AdminImageFileWidget
         },
     }
+
+    def show_mint(self, model):
+        if model.mint_mark:
+            return '%s (%s)' % (model.mint_mark.mark, model.mint_mark.mint)
+
+        return model.mint
+    show_mint.short_description = _('Mint')
 
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Country, CountryAdmin)

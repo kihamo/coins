@@ -28,7 +28,7 @@ class DatabaseStorage(DS):
             return None
 
         inMemFile = StringIO(b64decode(object.data))
-        inMemFile.name = name
+        inMemFile.name = object.filename
         inMemFile.mode = mode
 
         return ImageFile(inMemFile)

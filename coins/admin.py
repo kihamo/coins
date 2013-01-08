@@ -150,7 +150,7 @@ class IssueAdminForm(ModelForm):
 class IssueAdmin(CoinAbstractModelAdmin):
     list_display = ('show_image_reverse', 'name', 'show_nominal', 'year', 'coins_count', 'coins_booked_count')
     list_display_links = ('name',)
-    search_fields = ['name']
+    search_fields = ('name', 'catalog_number')
     inlines = (IssueMintInline, CoinInline)
     form = IssueAdminForm
     list_filter = ('type', 'year')

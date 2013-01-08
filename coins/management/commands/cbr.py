@@ -54,6 +54,18 @@ class Command(BaseCommand):
         '08': .5,   '17': 100, '26': 50000
     }
 
+    _mint_names_mapping = {
+        u'санкт-петергбургский монетный двор' : u'санкт-петербургский монетный двор',
+        u'санкт-петергбурский монетный двор'  : u'санкт-петербургский монетный двор',
+        u'санкт-петербугрский монетный двор'  : u'санкт-петербургский монетный двор',
+        u'санкт петербургский'                : u'санкт-петербургский монетный двор',
+
+        u'ленинградский монетный двор'        : u'санкт-петербургский монетный двор',
+        u'лениградский монетный двор'         : u'санкт-петербургский монетный двор',
+        u'московкий монетный двор'            : u'московский монетный двор',
+        u'московский монетный'                : u'московский монетный двор',
+    }
+
     def _load_url(self, url):
         self.stdout.write(self.styles['load_url']("Load page %s\n" % url))
 
@@ -92,13 +104,14 @@ class Command(BaseCommand):
             raise CommandError('Years list not found')
 
         if year:
-            year = (year,)
+            year = (int(year),)
 
         for element in years:
-            if year and element.text not in year:
+            year_value = int(element.text)
+
+            if year and year_value not in year:
                 continue
 
-            year_value = int(element.text)
             year_id = int(element.get('value'))
 
             self.stdout.write(self.styles['import_item']("Parse year %d\n" % year_value))
@@ -126,8 +139,13 @@ class Command(BaseCommand):
                 text = ''
                 index = ''
 
-                for t in doc.xpath('.//table[2]/tr/td[2]/descendant-or-self::*/text()'):
-                    t = t.strip()
+                for node in doc.xpath('.//table[2]/tr/td[2]/descendant-or-self::*'):
+                    t = ''
+
+                    if len(node):
+                        t = "\n".join(node.xpath('text()')).strip()
+                    elif node.text:
+                        t = node.text.strip()
 
                     if len(t):
                         strings = t.split("\n")
@@ -142,10 +160,13 @@ class Command(BaseCommand):
                                     if len(text):
                                         info[index] = text
 
-                                    index = match.group(1).lower()
+                                    index = match.group(1).lower().replace('c', u'с')
                                     text = match.group(2)
                                 elif len(strings) == 1:
-                                    info['name'] = string
+                                    if node.tag == 'b':
+                                        info[u'серия'] = string
+                                    else:
+                                        info['name'] = string
                                 else:
                                     text = '%s %s' % (text, string)
 
@@ -159,7 +180,7 @@ class Command(BaseCommand):
 
                 columns = []
                 for font in tag.xpath('tr[1]/td/font'):
-                    key = ' '.join([w.strip().lower() for w in font.xpath('text()')])
+                    key = ' '.join([w.strip().lower().replace('c', u'с') for w in font.xpath('text()')])
 
                     if not key in self._column_names:
                         self._column_names.append(key)
@@ -198,7 +219,7 @@ class Command(BaseCommand):
                                         if len(text):
                                             info[index] = text
 
-                                        index = match.group(1).lower()
+                                        index = match.group(1).lower().replace('c', u'с')
                                         text = match.group(2)
                                     else:
                                         text = '%s %s' % (text, string)
@@ -262,23 +283,27 @@ class Command(BaseCommand):
                     self.stderr.write((self.styles['warning']('Error load %s file for coin id %d' % (model_key, issue.pk))))
 
         mapping = {
-            'catalog_number'    : 'catalog_number',
-            'name'              : 'name',
+            'catalog_number'        : 'catalog_number',
+            'name'                  : 'name',
 
-            u'дата выпуска'     : 'date_issue',
-            u'серия'            : 'series',
+            u'дата выпуска'         : 'date_issue',
+            u'серия'                : 'series',
+            u'географическая серия' : 'series',
+            u'историческая серия'   : 'series',
+            u'спортивная серия'     : 'series',
+            u'набор памятных монет' : 'series',
 
-            'description'       : 'desc',
-            u'аверс'            : 'desc_obverse',
-            u'реверс'           : 'desc_reverse',
-            u'оформление гурта' : 'desc_edge',
+            'description'           : 'desc',
+            u'аверс'                : 'desc_obverse',
+            u'реверс'               : 'desc_reverse',
+            u'оформление гурта'     : 'desc_edge',
 
-            u'сплав'            : 'alloy',
-            u'металл, проба'    : 'alloy',
-            u'тираж, шт.'       : 'mintage',
-            u'диаметр, мм'      : 'diameter',
-            u'толщина, мм'      : 'thickness',
-            u'масса общая, г'   : 'weight',
+            u'сплав'                : 'alloy',
+            u'металл, проба'        : 'alloy',
+            u'тираж, шт.'           : 'mintage',
+            u'диаметр, мм'          : 'diameter',
+            u'толщина, мм'          : 'thickness',
+            u'масса общая, г'       : 'weight',
         }
 
         for data_key, model_key in mapping.items():
@@ -288,6 +313,10 @@ class Command(BaseCommand):
 
                 if model_key == 'series':
                     new_value, created = Series.objects.get_or_create(name = new_value)
+
+                    if created:
+                        self.stdout.write((self.styles['import_item']("Add series '%s'\n" % new_value)))
+
                     set_new_value = True
                 elif model_key == 'mintage':
                     new_value = sum([int(i) for i in new_value])
@@ -311,18 +340,28 @@ class Command(BaseCommand):
 
         # mints
         data_key = u'чеканка'
-        if data.has_key(data_key) and not issue.mint.count():
-            mints = data[data_key].split(';')
-            for mint_data in mints:
-                match = re.match(
-                    r'^([^(]+?)\s*\((.+?)\)(?:\s*[^0-9\s]*\s*([0-9]+)\s*([^\s.]+))?',
-                    mint_data.strip().lower(),
+        if not data.has_key(data_key):
+            self.stderr.write((self.styles['warning']("Mint information not found\n")))
+        elif not issue.mint.count():
+            if not hasattr(self, '_mint_pattern'):
+                self._mint_pattern = re.compile(
+                    r'[\W]*([^(]+?)\s*\((.+?)\)(?:\s*[^\d\s.]*\s*([0-9\s]+)([\w]+)[.])?',
                     re.UNICODE
                 )
 
+            mints = data[data_key].split(';')
+            for mint_data in mints:
+                match = self._mint_pattern.match(mint_data.strip().lower())
+
                 if match:
                     found = False
+
                     mint_name = match.group(1).replace('c', u'с')
+                    mint_name = ' '.join(mint_name.split())
+
+                    if self._mint_names_mapping.has_key(mint_name):
+                        mint_name = self._mint_names_mapping[mint_name]
+
                     mark_name = match.group(2)
 
                     for mint in self._mints:
@@ -344,12 +383,12 @@ class Command(BaseCommand):
                                 kwargs['mint_mark'] = mark
 
                                 mark.save()
-                                self.stderr.write((self.styles['import_item']("Add mint mark '%s'\n" % mark)))
+                                self.stdout.write((self.styles['import_item']("Add mint mark '%s'\n" % mark)))
 
                             if match.group(3):
-                                kwargs['mintage'] = int(match.group(3))
+                                kwargs['mintage'] = int(match.group(3).replace(' ', ''))
 
-                                if match.group(4):
+                                if match.group(4) and match.group(4) != u'шт':
                                     if match.group(4) == u'млн':
                                         kwargs['mintage'] *= 1000000
                                     else:

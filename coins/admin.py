@@ -43,6 +43,10 @@ class MintMarkInline(admin.TabularInline):
     model = MintMark
     extra = 1
 
+class IssueMintInline(admin.TabularInline):
+    model = IssueMint
+    extra = 1
+
 class CoinInline(admin.StackedInline):
     model = Coin
     extra = 1
@@ -119,7 +123,16 @@ class CurrencyAdmin(CoinAbstractModelAdmin):
     inlines = (CountryInline,)
 
 class MintAdmin(CoinAbstractModelAdmin):
+    list_display = ('show_country', 'name')
+    list_display_links = ('name',)
     inlines = (MintMarkInline,)
+
+    def show_country(self, model):
+        if model.country:
+            return model.country.iso
+
+        return ''
+    show_country.short_description = _('Country')
 
 class IssueAdminForm(ModelForm):
     class Meta:
@@ -138,7 +151,7 @@ class IssueAdmin(CoinAbstractModelAdmin):
     list_display = ('show_image_reverse', 'name', 'show_nominal', 'year', 'coins_count', 'coins_booked_count')
     list_display_links = ('name',)
     search_fields = ['name']
-    inlines = (CoinInline,)
+    inlines = (IssueMintInline, CoinInline)
     form = IssueAdminForm
     list_filter = ('type', 'year')
     actions = (print_boxes_not_packed, print_boxes_all)

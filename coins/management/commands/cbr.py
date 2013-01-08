@@ -12,7 +12,7 @@ from lxml.etree import parse, HTMLParser
 import urllib2
 from urlparse import urlparse
 
-from coins.models import Issue, Country, Series
+from coins.models import Issue, Country, Series, Mint, MintMark, IssueMint
 from datetime import datetime
 
 from django.core.files.images import ImageFile
@@ -159,11 +159,7 @@ class Command(BaseCommand):
 
                 columns = []
                 for font in tag.xpath('tr[1]/td/font'):
-                    key = ''
-                    for text in font.xpath('text()'):
-                        key += ' ' + text.strip()
-
-                    key = key.strip().lower()
+                    key = ' '.join([w.strip().lower() for w in font.xpath('text()')])
 
                     if not key in self._column_names:
                         self._column_names.append(key)
@@ -174,8 +170,9 @@ class Command(BaseCommand):
 
                 for tr in tag.xpath('tr[position()>1]'):
                     i = 0
-                    for td in tr.xpath('td/font/text()'):
-                        info[columns[i]].append(td.strip())
+                    for font in tr.xpath('td/font'):
+                        text = ' '.join([w.strip() for w in font.xpath('text()')])
+                        info[columns[i]].append(text)
                         i += 1
 
                 # descriptions
@@ -229,6 +226,9 @@ class Command(BaseCommand):
                 self._country = Country.objects.get(iso = 'RUS')
             except:
                 raise CommandError('RUS country not found')
+
+        if not hasattr(self, '_mints'):
+            self._mints = list(Mint.objects.filter(country = self._country))
 
         issue, created = Issue.objects.get_or_create(
             catalog_number = data['catalog_number'],
@@ -308,3 +308,59 @@ class Command(BaseCommand):
                     issue.__setattr__(model_key, new_value)
 
         issue.save()
+
+        # mints
+        data_key = u'чеканка'
+        if data.has_key(data_key) and not issue.mint.count():
+            mints = data[data_key].split(';')
+            for mint_data in mints:
+                match = re.match(
+                    r'^([^(]+?)\s*\((.+?)\)(?:\s*[^0-9\s]*\s*([0-9]+)\s*([^\s.]+))?',
+                    mint_data.strip().lower(),
+                    re.UNICODE
+                )
+
+                if match:
+                    found = False
+                    mint_name = match.group(1).replace('c', u'с')
+                    mark_name = match.group(2)
+
+                    for mint in self._mints:
+                        if mint.__unicode__().lower() == mint_name:
+                            kwargs = {
+                                'issue': issue,
+                                'mint': mint
+                            }
+
+                            mark_found = False
+                            for mark in mint.mintmark_set.all():
+                                if mark.__unicode__().lower() == mark_name:
+                                    kwargs['mint_mark'] = mark
+                                    mark_found = True
+                                    break
+
+                            if not mark_found:
+                                mark = MintMark(mark = mark_name, mint = mint)
+                                kwargs['mint_mark'] = mark
+
+                                mark.save()
+                                self.stderr.write((self.styles['import_item']("Add mint mark '%s'\n" % mark)))
+
+                            if match.group(3):
+                                kwargs['mintage'] = int(match.group(3))
+
+                                if match.group(4):
+                                    if match.group(4) == u'млн':
+                                        kwargs['mintage'] *= 1000000
+                                    else:
+                                        self.stderr.write((self.styles['warning']("Unknown unit '%s'\n" % match.group(4))))
+                            elif len(mints) == 1 and issue.mintage:
+                                kwargs['mintage'] = issue.mintage
+
+                            IssueMint(**kwargs).save()
+
+                            found = True
+                            break
+
+                    if not found:
+                        self.stderr.write((self.styles['warning']("Mint '%s' not found\n" % mint_name)))

@@ -130,6 +130,10 @@ class Mint(CoinAbstract):
         help_text=_('Mint name'),
         max_length=100
     )
+    country = models.ForeignKey(
+        Country,
+        verbose_name=_('Country')
+    )
 
     class Meta(CoinAbstract.Meta):
         verbose_name = _('mint')
@@ -150,6 +154,10 @@ class MintMark(CoinAbstract):
     class Meta(CoinAbstract.Meta):
         verbose_name = _('mark mint')
         verbose_name_plural = _('marks mints')
+
+    def save(self, **kwargs):
+        self.mark = self.mark.upper()
+        super(MintMark, self).save(**kwargs)
 
     def __unicode__(self):
         return self.mark
@@ -208,6 +216,13 @@ class Issue(CoinAbstract):
         blank=True,
         null=True
     )
+    mint = models.ManyToManyField(
+        Mint,
+        through='IssueMint',
+        verbose_name=_('Mint'),
+        null=True,
+        blank=True
+    )
     series = models.ForeignKey(
         Series,
         verbose_name=_('Series'),
@@ -252,8 +267,8 @@ class Issue(CoinAbstract):
         null=True
     )
     mintage = models.IntegerField(
-        _('Mintage'),
-        help_text=_('Mintage in pieces'),
+        _('Total mintage'),
+        help_text=_('Total mintage in pieces'),
         blank=True,
         null=True
     )
@@ -303,6 +318,34 @@ class Issue(CoinAbstract):
     def coins_booked_count(self):
         return self.coin_set.filter(booked=True).count()
     coins_booked_count.short_description = _('Booked coins count')
+
+class IssueMint(CoinAbstract):
+    issue = models.ForeignKey(
+        Issue,
+        verbose_name=_('Issue')
+    )
+    mint = models.ForeignKey(
+        Mint,
+        verbose_name=_('Mint')
+    )
+    mint_mark = models.ForeignKey(
+        MintMark,
+        verbose_name=_('Mint mark'),
+        blank=True,
+        null=True
+    )
+    mintage = models.IntegerField(
+        _('Mintage'),
+        help_text=_('Mintage in pieces'),
+        blank=True,
+        null=True
+    )
+
+    class Meta:
+        db_table = 'coins_issue_mint'
+        auto_created = Issue
+        verbose_name = _('mint')
+        verbose_name_plural = _('mints')
 
 class Coin(CoinAbstract):
     issue = models.ForeignKey(

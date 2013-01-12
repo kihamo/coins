@@ -88,27 +88,10 @@ class CoinInline(admin.StackedInline):
         return self._show_barcode_image(coin, 'qr')
     qr_code.allow_tags = True
 
-class CoinCollectionInline(CoinInline):
-    fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('barcode', 'qr_code', 'issue', 'collection', 'mint', 'mint_mark', 'grade', 'in_album', 'packaged', 'booked')
-        }),
-        (None, {
-            'classes': ('wide',),
-            'fields': ('image_obverse', 'image_reverse')
-        }),
-        (None, {
-            'classes': ('wide',),
-            'fields': ('features',)
-        })
-    )
-
 # -------- General --------
 class CollectionAdmin(CoinAbstractModelAdmin):
     list_display = ('name', 'coins_count')
     list_display_links = ('name',)
-    inlines = (CoinCollectionInline,)
 
 class CountryAdmin(CoinAbstractModelAdmin):
     list_display = ('iso', 'name', 'currency')

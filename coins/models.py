@@ -354,7 +354,9 @@ class Coin(CoinAbstract):
     )
     mint = models.ForeignKey(
         Mint,
-        verbose_name=_('Mint')
+        verbose_name=_('Mint'),
+        blank=True,
+        null=True
     )
     mint_mark = models.ForeignKey(
         MintMark,

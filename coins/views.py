@@ -80,7 +80,6 @@ def box(request, coin_id, view_format = 'html'):
     if view_format not in ('html', 'pdf'):
         view_format = 'html'
 
-
     if view_format == 'html':
         return render_to_response('box.html', {'coin': coin})
 

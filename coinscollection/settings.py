@@ -16,7 +16,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/home/kihamo/coinscollection/coinscollection/data/coins.db',
+        'NAME': os.path.join(PROJECT_PATH, 'data', 'coins.db'),
     }
 }
 

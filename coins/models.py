@@ -17,6 +17,14 @@ class CoinAbstract(models.Model):
 
         return '%s object' % self.__class__.__name__
 
+class IsoAbstract(CoinAbstract):
+    class Meta:
+        abstract = True
+
+    def save(self, **kwargs):
+        self.iso = self.iso.upper()
+        super(IsoAbstract, self).save(**kwargs)
+
 class Image(CoinAbstract):
     hash = models.CharField(
         editable = False,
@@ -48,11 +56,33 @@ class Image(CoinAbstract):
         pass
 
 # -------- Models --------
+class Country(IsoAbstract):
+    iso = models.CharField(
+        _('ISO code'),
+        help_text=_('Country ISO 3 code'),
+        max_length=3,
+        blank=True,
+        null=True
+    )
+    name = models.CharField(
+        _('Name'),
+        help_text=_('Country name'),
+        max_length=100
+    )
+    current_currency = models.ForeignKey(
+        'coins.Currency',
+        related_name='current_currency',
+        verbose_name=_('Current currency'),
+        blank=True,
+        null=True
+    )
 
-# http://www.currency-iso.org/isocy/global/en/home/tables/table-a1.html
-# http://www.currency-iso.org/dam/isocy/downloads/dl_iso_table_a1.xls
-# http://www.currency-iso.org/dam/isocy/downloads/dl_iso_table_a1.xml
-class Currency(CoinAbstract):
+    class Meta(CoinAbstract.Meta):
+        ordering = ['iso']
+        verbose_name = _('country')
+        verbose_name_plural = _('countries')
+
+class Currency(IsoAbstract):
     iso = models.CharField(
         _('ISO code'),
         help_text=_('Currency ISO 3 code'),
@@ -72,6 +102,13 @@ class Currency(CoinAbstract):
         blank=True,
         null=True
     )
+    countries = models.ManyToManyField(
+        Country,
+        through='CurrencyHistory',
+        verbose_name=_('Country'),
+        null=True,
+        blank=True
+    )
 
     class Meta(CoinAbstract.Meta):
         ordering = ['name']
@@ -84,30 +121,33 @@ class Currency(CoinAbstract):
 
         return self.name
 
-class Country(CoinAbstract):
-    iso = models.CharField(
-        _('ISO code'),
-        help_text=_('Country ISO 3 code'),
-        max_length=3,
-        blank=True,
-        null=True
-    )
-    name = models.CharField(
-        _('Name'),
-        help_text=_('Country name'),
-        max_length=100
+class CurrencyHistory(CoinAbstract):
+    country = models.ForeignKey(
+        Country,
+        verbose_name=_('Country')
     )
     currency = models.ForeignKey(
         Currency,
-        verbose_name=_('Current currency'),
+        verbose_name=_('Currency')
+    )
+    date_from = models.DateField(
+        _('Date from'),
+        help_text=_('Date from'),
+        blank=True,
+        null=True
+    )
+    date_to = models.DateField(
+        _('Date to'),
+        help_text=_('Date to'),
         blank=True,
         null=True
     )
 
-    class Meta(CoinAbstract.Meta):
-        ordering = ['iso']
-        verbose_name = _('country')
-        verbose_name_plural = _('countries')
+    class Meta:
+        db_table = 'coins_currencies_history'
+        auto_created = Currency
+        verbose_name = _('currency')
+        verbose_name_plural = _('currencies')
 
 class Collection(CoinAbstract):
     name = models.CharField(
@@ -145,7 +185,6 @@ class MintMark(CoinAbstract):
         help_text=_('Mint mark'),
         max_length=50
     )
-
     mint = models.ForeignKey(
         Mint,
         verbose_name=_('Mint')

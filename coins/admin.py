@@ -34,17 +34,16 @@ class CoinAbstractModelAdmin(admin.ModelAdmin):
     }
 
 # -------- Inline --------
-class CountryInline(admin.TabularInline):
-    model = Country
-    extra = 1
-    readonly_fields = ('name', 'iso')
-
 class MintMarkInline(admin.TabularInline):
     model = MintMark
     extra = 1
 
 class IssueMintInline(admin.TabularInline):
     model = IssueMint
+    extra = 1
+
+class CurrencyHistoryInline(admin.TabularInline):
+    model = CurrencyHistory
     extra = 1
 
 class CoinInline(admin.StackedInline):
@@ -94,16 +93,18 @@ class CollectionAdmin(CoinAbstractModelAdmin):
     list_display_links = ('name',)
 
 class CountryAdmin(CoinAbstractModelAdmin):
-    list_display = ('iso', 'name', 'currency')
+    list_display = ('iso', 'name', 'current_currency')
     list_display_links = ('name',)
     search_fields = ['iso', 'name']
+    inlines = (CurrencyHistoryInline,)
 
 class CurrencyAdmin(CoinAbstractModelAdmin):
     list_display = ('iso', 'name')
     list_display_links = ('name',)
     search_fields = ['iso', 'name']
     ordering = ['iso']
-    inlines = (CountryInline,)
+    exclude = ('countries',)
+    inlines = (CurrencyHistoryInline,)
 
 class MintAdmin(CoinAbstractModelAdmin):
     list_display = ('show_country', 'name')

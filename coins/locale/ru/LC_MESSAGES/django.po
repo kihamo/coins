@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: coins\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-08 14:00+0400\n"
+"POT-Creation-Date: 2013-04-22 00:58+0400\n"
 "PO-Revision-Date: 2012-12-26 01:53+0400\n"
 "Last-Translator: Kihamo <infokihamo.ru>\n"
 "Language-Team: Russian <infokihamo.ru>\n"
@@ -26,323 +26,331 @@ msgstr "Печать боксов только для не упакованны�
 msgid "Print coin boxes for all coins"
 msgstr "Печать боксов для всех монет"
 
-#: admin.py:81
+#: admin.py:80
 msgid "Coin barcode"
 msgstr "Штрихкод монеты"
 
-#: admin.py:135 models.py:135 models.py:211
+#: admin.py:119 models.py:108 models.py:127 models.py:175 models.py:254
 msgid "Country"
 msgstr "Страна"
 
-#: admin.py:161
+#: admin.py:145
 msgid "Main information"
 msgstr "Основная информация"
 
-#: admin.py:167
+#: admin.py:151
 msgid "Catalog information"
 msgstr "Каталожная информация"
 
-#: admin.py:171
+#: admin.py:155
 msgid "Physical parameters"
 msgstr "Физические параметры"
 
-#: admin.py:175 models.py:272
+#: admin.py:159 models.py:315
 msgid "Description"
 msgstr "Описание"
 
-#: admin.py:188 models.py:191
+#: admin.py:172 models.py:234
 msgid "Nominal"
 msgstr "Номинал"
 
-#: admin.py:196 models.py:289 models.py:294 models.py:371
+#: admin.py:180 models.py:332 models.py:337 models.py:422
 msgid "Reverse"
 msgstr "Оборотная сторона"
 
-#: admin.py:233 models.py:151 models.py:218 models.py:325 models.py:347
+#: admin.py:217 models.py:190 models.py:261 models.py:368 models.py:396
 msgid "Mint"
 msgstr "Монетный двор"
 
-#: models.py:57 models.py:89
+#: models.py:61 models.py:87
 msgid "ISO code"
 msgstr "ISO код"
 
-#: models.py:58
-msgid "Currency ISO 3 code"
-msgstr "Трехзначный ISO код валюты"
-
-#: models.py:64 models.py:96 models.py:114 models.py:129 models.py:163
-#: models.py:179
-msgid "Name"
-msgstr "Название"
-
-#: models.py:65
-msgid "Currency name"
-msgstr "Название валюты"
-
-#: models.py:69
-msgid "Sign"
-msgstr "Знак"
-
-#: models.py:70
-msgid "Currency sign"
-msgstr "Знак валюты"
-
-#: models.py:78
-msgid "currency"
-msgstr "валюта"
-
-#: models.py:79
-msgid "currencies"
-msgstr "валюты"
-
-#: models.py:90
+#: models.py:62
 msgid "Country ISO 3 code"
 msgstr "Трехзначный ISO код страны"
 
-#: models.py:97
+#: models.py:68 models.py:94 models.py:154 models.py:169 models.py:206
+#: models.py:222
+msgid "Name"
+msgstr "Название"
+
+#: models.py:69
 msgid "Country name"
 msgstr "Название страны"
 
-#: models.py:102
+#: models.py:75
 msgid "Current currency"
 msgstr "Текущая валюта"
 
-#: models.py:109
+#: models.py:82
 msgid "country"
 msgstr "страна"
 
-#: models.py:110
+#: models.py:83
 msgid "countries"
 msgstr "страны"
 
-#: models.py:116
-msgid "Collection name"
-msgstr "Название коллекции"
+#: models.py:88
+msgid "Currency ISO 3 code"
+msgstr "Трехзначный ISO код валюты"
 
-#: models.py:120
-msgid "collection"
-msgstr "коллекция"
+#: models.py:95
+msgid "Currency name"
+msgstr "Название валюты"
 
-#: models.py:121
-msgid "collections"
-msgstr "коллекции"
-
-#: models.py:125 models.py:312
-msgid "Coins count"
-msgstr "Количество монет"
-
-#: models.py:130
-msgid "Mint name"
-msgstr "Название монетного двора"
-
-#: models.py:139 models.py:337
-msgid "mint"
-msgstr "монетный двор"
-
-#: models.py:140 models.py:338
-msgid "mints"
-msgstr "монетные дворы"
-
-#: models.py:144
-msgid "Mark"
+#: models.py:99
+msgid "Sign"
 msgstr "Знак"
 
-#: models.py:145 models.py:351
-msgid "Mint mark"
-msgstr "Знаки монетного двора"
+#: models.py:100
+msgid "Currency sign"
+msgstr "Знак валюты"
 
-#: models.py:155
-msgid "mark mint"
-msgstr "знак монетного двора"
+#: models.py:115 models.py:149
+msgid "currency"
+msgstr "валюта"
 
-#: models.py:156
-msgid "marks mints"
-msgstr "знаки монетных дворов"
+#: models.py:116 models.py:150
+msgid "currencies"
+msgstr "валюты"
 
-#: models.py:164
-msgid "Series name"
-msgstr "Название серии"
-
-#: models.py:169 models.py:170
-msgid "series"
-msgstr "серия"
-
-#: models.py:174
-msgid "Commemorative"
-msgstr "Памятная"
-
-#: models.py:175
-msgid "Regular"
-msgstr "Регулярная"
-
-#: models.py:181
-msgid "Issue name"
-msgstr "Название выпуска"
-
-#: models.py:184
-msgid "Type"
-msgstr "Тип"
-
-#: models.py:185
-msgid "Type coin"
-msgstr "Тип монеты"
-
-#: models.py:197
+#: models.py:131 models.py:240
 msgid "Currency"
 msgstr "Валюта"
 
-#: models.py:200
+#: models.py:134 models.py:135
+msgid "Date from"
+msgstr "Дата начала действия"
+
+#: models.py:140 models.py:141
+msgid "Date to"
+msgstr "Дата окончания действия"
+
+#: models.py:156
+msgid "Collection name"
+msgstr "Название коллекции"
+
+#: models.py:160
+msgid "collection"
+msgstr "коллекция"
+
+#: models.py:161
+msgid "collections"
+msgstr "коллекции"
+
+#: models.py:165 models.py:355
+msgid "Coins count"
+msgstr "Количество монет"
+
+#: models.py:170
+msgid "Mint name"
+msgstr "Название монетного двора"
+
+#: models.py:179 models.py:386
+msgid "mint"
+msgstr "монетный двор"
+
+#: models.py:180 models.py:387
+msgid "mints"
+msgstr "монетные дворы"
+
+#: models.py:184
+msgid "Mark"
+msgstr "Знак"
+
+#: models.py:185 models.py:372 models.py:402
+msgid "Mint mark"
+msgstr "Знаки монетного двора"
+
+#: models.py:194
+msgid "mark mint"
+msgstr "знак монетного двора"
+
+#: models.py:195
+msgid "marks mints"
+msgstr "знаки монетных дворов"
+
+#: models.py:207
+msgid "Series name"
+msgstr "Название серии"
+
+#: models.py:212 models.py:213
+msgid "series"
+msgstr "серия"
+
+#: models.py:217
+msgid "Commemorative"
+msgstr "Памятная"
+
+#: models.py:218
+msgid "Regular"
+msgstr "Регулярная"
+
+#: models.py:224
+msgid "Issue name"
+msgstr "Название выпуска"
+
+#: models.py:227
+msgid "Type"
+msgstr "Тип"
+
+#: models.py:228
+msgid "Type coin"
+msgstr "Тип монеты"
+
+#: models.py:243
 msgid "Year"
 msgstr "Год"
 
-#: models.py:201
+#: models.py:244
 msgid "Year of issue"
 msgstr "Год выпуска"
 
-#: models.py:204
+#: models.py:247
 msgid "Date"
 msgstr "Дата"
 
-#: models.py:205
+#: models.py:248
 msgid "Date of issue"
 msgstr "Дата выпуска"
 
-#: models.py:224
+#: models.py:267
 msgid "Series"
 msgstr "Серия"
 
-#: models.py:229
+#: models.py:272
 msgid "Catalog number"
 msgstr "Каталожный номер"
 
-#: models.py:236
+#: models.py:279
 msgid "Diameter"
 msgstr "Диаметр"
 
-#: models.py:237
+#: models.py:280
 msgid "Diameter in millimeters"
 msgstr "Диаметр в миллиметрах"
 
-#: models.py:244
+#: models.py:287
 msgid "Alloy"
 msgstr "Сплав"
 
-#: models.py:250
+#: models.py:293
 msgid "Thickness"
 msgstr "Толщина"
 
-#: models.py:251
+#: models.py:294
 msgid "Thickness in millimeters"
 msgstr "Толщина в миллиметрах"
 
-#: models.py:258
+#: models.py:301
 msgid "Weight"
 msgstr "Вес"
 
-#: models.py:259
+#: models.py:302
 msgid "Weight in grams"
 msgstr "Вес в граммах"
 
-#: models.py:266
+#: models.py:309
 msgid "Total mintage"
 msgstr "Общий тираж"
 
-#: models.py:267
+#: models.py:310
 msgid "Total mintage in pieces"
 msgstr "Общий тираж в штуках"
 
-#: models.py:273
+#: models.py:316
 msgid "Coin description"
 msgstr "Описание монеты"
 
-#: models.py:278 models.py:283 models.py:366
+#: models.py:321 models.py:326 models.py:417
 msgid "Obverse"
 msgstr "Лицевая сторона"
 
-#: models.py:284
+#: models.py:327
 msgid "Obverse description"
 msgstr "Описание лицевой стороны"
 
-#: models.py:295
+#: models.py:338
 msgid "Reverse description"
 msgstr "Описание оборотной стороны"
 
-#: models.py:300
+#: models.py:343
 msgid "Edge"
 msgstr "Гурт"
 
-#: models.py:301
+#: models.py:344
 msgid "Edge description"
 msgstr "Описание гурта"
 
-#: models.py:307
+#: models.py:350
 msgid "issue"
 msgstr "выпуск"
 
-#: models.py:308
+#: models.py:351
 msgid "issues"
 msgstr "выпуски"
 
-#: models.py:316
+#: models.py:359
 msgid "Booked coins count"
 msgstr "Количество забронированных монет"
 
-#: models.py:321 models.py:343
+#: models.py:364 models.py:392
 msgid "Issue"
 msgstr "Выпуск"
 
-#: models.py:328
+#: models.py:377
 msgid "Mintage"
 msgstr "Тираж"
 
-#: models.py:329
+#: models.py:378
 msgid "Mintage in pieces"
 msgstr "Тираж в штуках"
 
-#: models.py:357
+#: models.py:408
 msgid "Collection"
 msgstr "Коллекция"
 
-#: models.py:360
+#: models.py:411
 msgid "Grade"
 msgstr "Качество"
 
-#: models.py:361
+#: models.py:412
 msgid "Grade value between 1 and 70"
 msgstr "Качество по шкале от 1 до 70"
 
-#: models.py:376
+#: models.py:427
 msgid "In albums"
 msgstr "В альбоме"
 
-#: models.py:377
+#: models.py:428
 msgid "Exists in albums"
 msgstr "Вложена в альбом"
 
-#: models.py:380
+#: models.py:431
 msgid "Packaged"
 msgstr "Упакована"
 
-#: models.py:381
+#: models.py:432
 msgid "Labeled and packaged"
 msgstr "Упакована и помечена"
 
-#: models.py:384
+#: models.py:435
 msgid "Booked"
 msgstr "Бронь"
 
-#: models.py:385
+#: models.py:436
 msgid "Coin is booked"
 msgstr "Монета забронирована"
 
-#: models.py:388
+#: models.py:439
 msgid "Features"
 msgstr "Особенности"
 
-#: models.py:394
+#: models.py:445
 msgid "coin"
 msgstr "монета"
 
-#: models.py:395
+#: models.py:446
 msgid "coins"
 msgstr "монеты"

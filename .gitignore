@@ -1,6 +1,6 @@
 .idea
 *.pyc
 *.mo
-coinscollection/data/coins.db
+*.db
 coinscollection/static/*
 env

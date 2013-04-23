@@ -1,5 +1,6 @@
 # Django settings for coinscollection project.
 import os
+from django.utils.translation import ugettext_lazy as _
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 ROOT_PATH = os.path.abspath(os.path.dirname(PROJECT_PATH))
@@ -128,6 +129,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     # required by django-admin-tools
     'django.core.context_processors.request',
+
+    'constance.context_processors.config',
 )
 
 INSTALLED_APPS = (
@@ -147,9 +150,17 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
 
     'south',
+    'constance',
+    'constance.backends.database',
 
     'coins',
 )
+
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+CONSTANCE_CONFIG = {
+    'DEFAULT_ISSUE_COUNTRY': ('RUS', _('Default issue country')),
+    'DEFAULT_ISSUE_CURRENCY': ('RUB', _('Default issue currency')),
+}
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

@@ -12,6 +12,8 @@ from utils.widgets import AdminImageFileWidget
 from views import barcode as barcode_view
 from models import *
 
+from constance import config
+
 # -------- Actions --------
 
 # TODO:
@@ -126,11 +128,11 @@ class CoinIssueAdminForm(ModelForm):
         if 'initial' in kwargs and not kwargs['initial']:
             kwargs['initial'] = {}
 
-            countries = Country.objects.filter(iso='RUS')
+            countries = Country.objects.filter(iso=config.DEFAULT_ISSUE_COUNTRY.upper())
             if countries:
                 kwargs['initial']['country'] = countries[0].id
 
-            currencies = Currency.objects.filter(iso='RUB')
+            currencies = Currency.objects.filter(iso=config.DEFAULT_ISSUE_CURRENCY.upper())
             if currencies:
                 kwargs['initial']['currency'] = currencies[0].id
 

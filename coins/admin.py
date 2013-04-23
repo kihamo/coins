@@ -124,10 +124,15 @@ class CoinIssueAdminForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         if 'initial' in kwargs and not kwargs['initial']:
-            kwargs['initial'] = {
-                'country': Country.objects.filter(iso='RUS')[0].id,
-                'currency': Currency.objects.filter(iso='RUB')[0].id,
-            }
+            kwargs['initial'] = {}
+
+            countries = Country.objects.filter(iso='RUS')
+            if countries:
+                kwargs['initial']['country'] = countries[0].id
+
+            currencies = Currency.objects.filter(iso='RUB')
+            if currencies:
+                kwargs['initial']['currency'] = currencies[0].id
 
         super(CoinIssueAdminForm, self).__init__(*args, **kwargs)
 

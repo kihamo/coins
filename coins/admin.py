@@ -118,9 +118,9 @@ class MintAdmin(CoinAbstractModelAdmin):
         return ''
     show_country.short_description = _('Country')
 
-class IssueAdminForm(ModelForm):
+class CoinIssueAdminForm(ModelForm):
     class Meta:
-        model = Issue
+        model = CoinIssue
 
     def __init__(self, *args, **kwargs):
         if 'initial' in kwargs and not kwargs['initial']:
@@ -129,14 +129,14 @@ class IssueAdminForm(ModelForm):
                 'currency': Currency.objects.filter(iso='RUB')[0].id,
             }
 
-        super(IssueAdminForm, self).__init__(*args, **kwargs)
+        super(CoinIssueAdminForm, self).__init__(*args, **kwargs)
 
-class IssueAdmin(CoinAbstractModelAdmin):
+class CoinIssueAdmin(CoinAbstractModelAdmin):
     list_display = ('show_image_reverse', 'name', 'show_nominal', 'year', 'coins_count', 'coins_booked_count')
     list_display_links = ('name',)
     search_fields = ('name', 'catalog_number')
     inlines = (IssueMintInline, CoinInline)
-    form = IssueAdminForm
+    form = CoinIssueAdminForm
     list_filter = ('type', 'year')
     actions = (print_boxes_not_packed, print_boxes_all)
     readonly_fields = ('catalog_number',)
@@ -188,7 +188,7 @@ class IssueAdmin(CoinAbstractModelAdmin):
         http://127.0.0.1:8000/admin/coins/coin/barcode/1.qr.png
         """
 
-        return super(IssueAdmin, self).get_urls() + patterns('',
+        return super(CoinIssueAdmin, self).get_urls() + patterns('',
             url(
                 r'^barcode\/(\d+)[.](?:(qr|code128))[.]png$',
                 barcode_view
@@ -219,7 +219,7 @@ class CoinAdmin(CoinAbstractModelAdmin):
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Currency, CurrencyAdmin)
-admin.site.register(Issue, IssueAdmin)
+admin.site.register(CoinIssue, CoinIssueAdmin)
 admin.site.register(Mint, MintAdmin)
 admin.site.register(Coin, CoinAdmin)
 

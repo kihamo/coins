@@ -6,7 +6,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from coins.utils.models import CoinImageField
 
-# -------- Service models --------
 class CoinAbstract(models.Model):
     class Meta:
         abstract = True
@@ -17,14 +16,6 @@ class CoinAbstract(models.Model):
 
         return '%s object' % self.__class__.__name__
 
-class IsoAbstract(CoinAbstract):
-    class Meta:
-        abstract = True
-
-    def save(self, **kwargs):
-        self.iso = self.iso.upper()
-        super(IsoAbstract, self).save(**kwargs)
-
 class Image(CoinAbstract):
     hash = models.CharField(
         editable = False,
@@ -32,19 +23,15 @@ class Image(CoinAbstract):
         primary_key = True,
         unique = True
     )
-
     filename = models.CharField(
         max_length=256
     )
-
     data = models.TextField(
         editable=False
     )
-
     size = models.PositiveIntegerField(
         editable=False
     )
-
     mime_type = models.CharField(
         null=True,
         blank=True,
@@ -52,23 +39,27 @@ class Image(CoinAbstract):
         max_length=50
     )
 
-    def resize(self, width=None, height=None):
-        pass
-
-# -------- Models --------
-class Country(IsoAbstract):
+# country & currency
+class IsoAbstract(CoinAbstract):
     iso = models.CharField(
         _('ISO code'),
-        help_text=_('Country ISO 3 code'),
         max_length=3,
         blank=True,
         null=True
     )
     name = models.CharField(
         _('Name'),
-        help_text=_('Country name'),
         max_length=100
     )
+
+    class Meta:
+        abstract = True
+
+    def save(self, **kwargs):
+        self.iso = self.iso.upper()
+        super(IsoAbstract, self).save(**kwargs)
+
+class Country(IsoAbstract):
     current_currency = models.ForeignKey(
         'coins.Currency',
         related_name='current_currency',
@@ -78,23 +69,17 @@ class Country(IsoAbstract):
     )
 
     class Meta(CoinAbstract.Meta):
+        db_table = 'coins_countries'
         ordering = ['iso']
         verbose_name = _('country')
         verbose_name_plural = _('countries')
 
+    def __init__(self, *args, **kwargs):
+        IsoAbstract.__init__(self, *args, **kwargs)
+        self._meta.get_field_by_name('iso')[0].help_text = _('Country ISO 3 code')
+        self._meta.get_field_by_name('name')[0].help_text = _('Country name')
+
 class Currency(IsoAbstract):
-    iso = models.CharField(
-        _('ISO code'),
-        help_text=_('Currency ISO 3 code'),
-        max_length=3,
-        blank=True,
-        null=True
-    )
-    name = models.CharField(
-        _('Name'),
-        help_text=_('Currency name'),
-        max_length=100
-    )
     sign = models.CharField(
         _('Sign'),
         help_text=_('Currency sign'),
@@ -111,9 +96,15 @@ class Currency(IsoAbstract):
     )
 
     class Meta(CoinAbstract.Meta):
+        db_table = 'coins_currencies'
         ordering = ['name']
         verbose_name = _('currency')
         verbose_name_plural = _('currencies')
+
+    def __init__(self, *args, **kwargs):
+        IsoAbstract.__init__(self, *args, **kwargs)
+        self._meta.get_field_by_name('iso')[0].help_text = _('Currency ISO 3 code')
+        self._meta.get_field_by_name('name')[0].help_text = _('Currency name')
 
     def __unicode__(self):
         if self.sign and len(self.sign):
@@ -157,6 +148,7 @@ class Collection(CoinAbstract):
     )
 
     class Meta(CoinAbstract.Meta):
+        db_table = 'coins_collections'
         verbose_name = _('collection')
         verbose_name_plural = _('collections')
 
@@ -164,6 +156,7 @@ class Collection(CoinAbstract):
         return self.coin_set.count()
     coins_count.short_description = _('Coins count')
 
+# coin
 class Mint(CoinAbstract):
     name = models.CharField(
         _('Name'),
@@ -176,6 +169,7 @@ class Mint(CoinAbstract):
     )
 
     class Meta(CoinAbstract.Meta):
+        db_table = 'coins_mints'
         verbose_name = _('mint')
         verbose_name_plural = _('mints')
 
@@ -191,6 +185,7 @@ class MintMark(CoinAbstract):
     )
 
     class Meta(CoinAbstract.Meta):
+        db_table = 'coins_mint_marks'
         verbose_name = _('mark mint')
         verbose_name_plural = _('marks mints')
 
@@ -209,10 +204,11 @@ class Series(CoinAbstract):
     )
 
     class Meta(CoinAbstract.Meta):
+        db_table = 'coins_series'
         verbose_name = _('series')
         verbose_name_plural = _('series')
 
-class Issue(CoinAbstract):
+class CoinIssue(CoinAbstract):
     TYPES_CHOICES = (
         (1, _('Commemorative')),
         (2, _('Regular')),
@@ -347,6 +343,7 @@ class Issue(CoinAbstract):
     )
 
     class Meta(CoinAbstract.Meta):
+        db_table = 'coins_coin_issues'
         verbose_name = _('issue')
         verbose_name_plural = _('issues')
 
@@ -360,7 +357,7 @@ class Issue(CoinAbstract):
 
 class IssueMint(CoinAbstract):
     issue = models.ForeignKey(
-        Issue,
+        CoinIssue,
         verbose_name=_('Issue')
     )
     mint = models.ForeignKey(
@@ -381,14 +378,14 @@ class IssueMint(CoinAbstract):
     )
 
     class Meta:
-        db_table = 'coins_issue_mint'
-        auto_created = Issue
+        db_table = 'coins_issue_mints'
+        auto_created = CoinIssue
         verbose_name = _('mint')
         verbose_name_plural = _('mints')
 
 class Coin(CoinAbstract):
     issue = models.ForeignKey(
-        Issue,
+        CoinIssue,
         verbose_name=_('Issue')
     )
     mint = models.ForeignKey(
@@ -442,6 +439,7 @@ class Coin(CoinAbstract):
     )
 
     class Meta(CoinAbstract.Meta):
+        db_table = 'coins_coins'
         verbose_name = _('coin')
         verbose_name_plural = _('coins')
 

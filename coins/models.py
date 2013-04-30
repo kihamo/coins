@@ -156,6 +156,10 @@ class Collection(CoinAbstract):
         return self.coin_set.count()
     coins_count.short_description = _('Coins count')
 
+    def banknotes_count(self):
+        return self.banknote_set.count()
+    banknotes_count.short_description = _('Banknotes count')
+
 # coin
 class Mint(CoinAbstract):
     name = models.CharField(
@@ -208,7 +212,10 @@ class Series(CoinAbstract):
         verbose_name = _('series')
         verbose_name_plural = _('series')
 
-class CoinIssue(CoinAbstract):
+class CopyIssueAbstract(CoinAbstract):
+    class Meta:
+        abstract = True
+
     TYPES_CHOICES = (
         (1, _('Commemorative')),
         (2, _('Regular')),
@@ -221,7 +228,6 @@ class CoinIssue(CoinAbstract):
     )
     type = models.PositiveSmallIntegerField(
         _('Type'),
-        help_text=_('Type coin'),
         max_length=1,
         choices=TYPES_CHOICES,
         default=1
@@ -231,32 +237,21 @@ class CoinIssue(CoinAbstract):
         max_digits=10,
         decimal_places=2
     )
+    country = models.ForeignKey(
+        Country,
+        verbose_name=_('Country')
+    )
     currency = models.ForeignKey(
         Currency,
         verbose_name=_('Currency')
     )
     year = models.IntegerField(
-        _('Year'),
-        help_text=_('Year of issue')
+        _('Year')
     )
     date_issue = models.DateField(
         _('Date'),
-        help_text=_('Date of issue'),
         blank=True,
         null=True
-    )
-    country = models.ForeignKey(
-        Country,
-        verbose_name=_('Country'),
-        blank=True,
-        null=True
-    )
-    mint = models.ManyToManyField(
-        Mint,
-        through='IssueMint',
-        verbose_name=_('Mint'),
-        null=True,
-        blank=True
     )
     series = models.ForeignKey(
         Series,
@@ -271,6 +266,47 @@ class CoinIssue(CoinAbstract):
         null=True,
         editable=False
     )
+    mintage = models.IntegerField(
+        _('Total mintage'),
+        help_text=_('Total mintage in pieces'),
+        blank=True,
+        null=True
+    )
+    desc = models.TextField(
+        _('Description'),
+        blank=True,
+        null=True
+    )
+    image_obverse = CoinImageField(
+        _('Obverse'),
+        blank=True,
+        null=True
+    )
+    desc_obverse = models.TextField(
+        _('Obverse description'),
+        blank=True,
+        null=True
+    )
+    image_reverse = CoinImageField(
+        _('Reverse'),
+        blank=True,
+        null=True
+    )
+    desc_reverse = models.TextField(
+        _('Reverse description'),
+        blank=True,
+        null=True
+    )
+
+    def copy_count(self):
+        pass
+    copy_count.short_description = _('Copy count')
+
+    def copy_booked_count(self):
+        pass
+    copy_booked_count.short_description = _('Booked copies count')
+
+class CoinIssue(CopyIssueAbstract):
     diameter = models.DecimalField(
         _('Diameter'),
         help_text=_('Diameter in millimeters'),
@@ -301,40 +337,6 @@ class CoinIssue(CoinAbstract):
         blank=True,
         null=True
     )
-    mintage = models.IntegerField(
-        _('Total mintage'),
-        help_text=_('Total mintage in pieces'),
-        blank=True,
-        null=True
-    )
-    desc = models.TextField(
-        _('Description'),
-        help_text=_('Coin description'),
-        blank=True,
-        null=True
-    )
-    image_obverse = CoinImageField(
-        _('Obverse'),
-        blank=True,
-        null=True
-    )
-    desc_obverse = models.TextField(
-        _('Obverse'),
-        help_text=_('Obverse description'),
-        blank=True,
-        null=True
-    )
-    image_reverse = CoinImageField(
-        _('Reverse'),
-        blank=True,
-        null=True
-    )
-    desc_reverse = models.TextField(
-        _('Reverse'),
-        help_text=_('Reverse description'),
-        blank=True,
-        null=True
-    )
     desc_edge = models.TextField(
         _('Edge'),
         help_text=_('Edge description'),
@@ -344,16 +346,43 @@ class CoinIssue(CoinAbstract):
 
     class Meta(CoinAbstract.Meta):
         db_table = 'coins_coin_issues'
-        verbose_name = _('issue')
-        verbose_name_plural = _('issues')
+        verbose_name = _('coin issue')
+        verbose_name_plural = _('coin issues')
 
-    def coins_count(self):
+    def copy_count(self):
         return self.coin_set.count()
-    coins_count.short_description = _('Coins count')
 
-    def coins_booked_count(self):
+    def copy_booked_count(self):
         return self.coin_set.filter(booked=True).count()
-    coins_booked_count.short_description = _('Booked coins count')
+
+class BanknoteIssue(CopyIssueAbstract):
+    weight = models.DecimalField(
+        _('Weight'),
+        help_text=_('Weight in millimetrs'),
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True
+    )
+    height = models.DecimalField(
+        _('Height'),
+        help_text=_('Height in millimetrs'),
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True
+    )
+
+    class Meta(CoinAbstract.Meta):
+        db_table = 'coins_banknote_issues'
+        verbose_name = _('banknote issue')
+        verbose_name_plural = _('banknote issues')
+
+    def copy_count(self):
+        return self.banknote_set.count()
+
+    def copy_booked_count(self):
+        return self.banknote_set.filter(booked=True).count()
 
 class IssueMint(CoinAbstract):
     issue = models.ForeignKey(
@@ -379,27 +408,13 @@ class IssueMint(CoinAbstract):
 
     class Meta:
         db_table = 'coins_issue_mints'
-        auto_created = CoinIssue
         verbose_name = _('mint')
         verbose_name_plural = _('mints')
 
-class Coin(CoinAbstract):
-    issue = models.ForeignKey(
-        CoinIssue,
-        verbose_name=_('Issue')
-    )
-    mint = models.ForeignKey(
-        Mint,
-        verbose_name=_('Mint'),
-        blank=True,
-        null=True
-    )
-    mint_mark = models.ForeignKey(
-        MintMark,
-        verbose_name=_('Mint mark'),
-        blank=True,
-        null=True
-    )
+class CopyAbstract(CoinAbstract):
+    class Meta:
+        abstract = True
+
     collection = models.ForeignKey(
         Collection,
         verbose_name=_('Collection')
@@ -421,27 +436,19 @@ class Coin(CoinAbstract):
         null=True
     )
     in_album = models.BooleanField(
-        _('In albums'),
-        help_text=_('Exists in albums')
+        _('In albums')
     )
     packaged = models.BooleanField(
-        _('Packaged'),
-        help_text=_('Labeled and packaged')
+        _('Packaged')
     )
     booked = models.BooleanField(
-        _('Booked'),
-        help_text=_('Coin is booked')
+        _('Booked')
     )
     features = models.TextField(
         _('Features'),
         blank=True,
         null=True
     )
-
-    class Meta(CoinAbstract.Meta):
-        db_table = 'coins_coins'
-        verbose_name = _('coin')
-        verbose_name_plural = _('coins')
 
     def get_absolute_url(self):
         return "/coin/%s/" % self.barcode
@@ -485,4 +492,38 @@ class Coin(CoinAbstract):
         if self.in_album and not self.packaged:
             self.packaged = True
 
-        super(Coin, self).save(*args, **kwargs)
+        super(CopyAbstract, self).save(*args, **kwargs)
+
+class Coin(CopyAbstract):
+    issue = models.ForeignKey(
+        CoinIssue,
+        verbose_name=_('Issue')
+    )
+    mint = models.ForeignKey(
+        Mint,
+        verbose_name=_('Mint'),
+        blank=True,
+        null=True
+    )
+    mint_mark = models.ForeignKey(
+        MintMark,
+        verbose_name=_('Mint mark'),
+        blank=True,
+        null=True
+    )
+
+    class Meta(CoinAbstract.Meta):
+        db_table = 'coins_coins'
+        verbose_name = _('coin')
+        verbose_name_plural = _('coins')
+
+class Banknote(CopyAbstract):
+    issue = models.ForeignKey(
+        BanknoteIssue,
+        verbose_name=_('Issue')
+    )
+
+    class Meta(CoinAbstract.Meta):
+        db_table = 'coins_banknotes'
+        verbose_name = _('banknote')
+        verbose_name_plural = _('banknotes')

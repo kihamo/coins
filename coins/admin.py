@@ -48,38 +48,16 @@ class CurrencyHistoryInline(admin.TabularInline):
     model = CurrencyHistory
     extra = 1
 
-class CoinInline(admin.StackedInline):
-    model = Coin
+class CopyInline(admin.StackedInline):
     extra = 1
     readonly_fields = ('barcode','qr_code')
-
-    fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('barcode', 'qr_code', 'collection', 'mint', 'mint_mark', 'grade', 'in_album', 'packaged', 'booked')
-        }),
-        (None, {
-            'classes': ('wide',),
-            'fields': ('image_obverse', 'image_reverse')
-        }),
-        (None, {
-            'classes': ('wide',),
-            'fields': ('features',)
-        })
-    )
-
-    formfield_overrides = {
-        models.ImageField: {
-            'widget': AdminImageFileWidget
-        },
-    }
 
     def _show_barcode_image(self, model, type):
         if not model.id or not model.issue:
             return ''
 
         url = reverse(barcode_view, args=[model.id, type])
-        return '<img src="%s" alt="%s"/>' % (url, ugettext('Coin barcode'))
+        return '<img src="%s" alt="%s"/>' % (url, ugettext('Barcode'))
 
     def barcode(self, coin):
         return self._show_barcode_image(coin, 'code128')
@@ -89,10 +67,43 @@ class CoinInline(admin.StackedInline):
         return self._show_barcode_image(coin, 'qr')
     qr_code.allow_tags = True
 
+class CoinInline(CopyInline):
+    model = Coin
+    fields = (
+        ('barcode', 'qr_code'),
+        'collection', 'grade',
+        ('mint', 'mint_mark'),
+        ('in_album', 'packaged', 'booked'),
+        ('image_obverse', 'image_reverse'),
+        'features'
+    )
+
+class BanknoteInline(CopyInline):
+    model = Banknote
+    fields = (
+        ('barcode', 'qr_code'),
+        'collection', 'grade',
+        ('in_album', 'packaged', 'booked'),
+        ('image_obverse', 'image_reverse'),
+        'features'
+    )
+
 # -------- General --------
 class CollectionAdmin(CoinAbstractModelAdmin):
-    list_display = ('name', 'coins_count')
+    list_display = ('name', 'coins_count', 'banknotes_count')
     list_display_links = ('name',)
+
+class MintAdmin(CoinAbstractModelAdmin):
+    list_display = ('show_country', 'name')
+    list_display_links = ('name',)
+    inlines = (MintMarkInline,)
+
+    def show_country(self, model):
+        if model.country:
+            return model.country.iso
+
+        return ''
+    show_country.short_description = _('Country')
 
 class CountryAdmin(CoinAbstractModelAdmin):
     list_display = ('iso', 'name', 'current_currency')
@@ -108,19 +119,7 @@ class CurrencyAdmin(CoinAbstractModelAdmin):
     exclude = ('countries',)
     inlines = (CurrencyHistoryInline,)
 
-class MintAdmin(CoinAbstractModelAdmin):
-    list_display = ('show_country', 'name')
-    list_display_links = ('name',)
-    inlines = (MintMarkInline,)
-
-    def show_country(self, model):
-        if model.country:
-            return model.country.iso
-
-        return ''
-    show_country.short_description = _('Country')
-
-class CoinIssueAdminForm(ModelForm):
+class CopyIssueAdminForm(ModelForm):
     class Meta:
         model = CoinIssue
 
@@ -136,38 +135,14 @@ class CoinIssueAdminForm(ModelForm):
             if currencies:
                 kwargs['initial']['currency'] = currencies[0].id
 
-        super(CoinIssueAdminForm, self).__init__(*args, **kwargs)
+        super(CopyIssueAdminForm, self).__init__(*args, **kwargs)
 
-class CoinIssueAdmin(CoinAbstractModelAdmin):
-    list_display = ('show_image_reverse', 'name', 'show_nominal', 'year', 'coins_count', 'coins_booked_count')
+class CopyIssueAdminAbstract(CoinAbstractModelAdmin):
+    list_display = ('show_image_reverse', 'name', 'show_nominal', 'year', 'copy_count', 'copy_booked_count')
     list_display_links = ('name',)
-    search_fields = ('name', 'catalog_number')
-    inlines = (IssueMintInline, CoinInline)
-    form = CoinIssueAdminForm
     list_filter = ('type', 'year')
-    actions = (print_boxes_not_packed, print_boxes_all)
+    search_fields = ('name', 'catalog_number')
     readonly_fields = ('catalog_number',)
-
-    fieldsets = (
-        (_('Main information'), {
-            'classes': ('wide',),
-            'fields': (
-                'name', 'type', 'nominal', 'currency', 'year', 'date_issue', 'country'
-            )
-        }),
-        (_('Catalog information'), {
-            'classes': ('wide',),
-            'fields': ('catalog_number', 'series')
-        }),
-        (_('Physical parameters'), {
-            'classes': ('wide',),
-            'fields': ('alloy', 'diameter', 'thickness', 'weight', 'mintage')
-        }),
-        (_('Description'), {
-            'classes': ('wide',),
-            'fields': ('desc', 'image_obverse', 'desc_obverse', 'image_reverse', 'desc_reverse', 'desc_edge')
-        }),
-    )
 
     def show_nominal(self, model):
         if model.currency.sign:
@@ -195,26 +170,100 @@ class CoinIssueAdmin(CoinAbstractModelAdmin):
         http://127.0.0.1:8000/admin/coins/coin/barcode/1.qr.png
         """
 
-        return super(CoinIssueAdmin, self).get_urls() + patterns('',
+        return super(CopyIssueAdminAbstract, self).get_urls() + patterns('',
             url(
                 r'^barcode\/(\d+)[.](?:(qr|code128))[.]png$',
                 barcode_view
             ),
         )
 
+class CoinIssueAdminForm(CopyIssueAdminForm):
+    class Meta:
+        model = CoinIssue
 
-class CoinAdmin(CoinAbstractModelAdmin):
-    list_display = ('issue', 'show_mint', 'in_album', 'packaged', 'booked')
+class CoinIssueAdmin(CopyIssueAdminAbstract):
+    form = CoinIssueAdminForm
+    inlines = (IssueMintInline, CoinInline)
+    actions = (print_boxes_not_packed, print_boxes_all)
+    fieldsets = (
+        (_('Main information'), {
+            'classes': ('wide',),
+            'fields': (
+                'name',
+                ('nominal', 'type'),
+                ('country', 'currency'),
+                ('year', 'date_issue'),
+                ('series', 'catalog_number')
+            )
+        }),
+        (_('Physical parameters'), {
+            'classes': ('wide',),
+            'fields': (
+                ('diameter', 'weight', 'thickness'),
+                'desc_edge', 'alloy'
+            )
+        }),
+        (_('Description'), {
+            'classes': ('wide',),
+            'fields': (
+                ('image_obverse', 'image_reverse'),
+                'desc', 'desc_obverse', 'desc_reverse'
+            )
+        })
+    )
+
+class BanknoteIssueAdminForm(CopyIssueAdminForm):
+    class Meta:
+        model = BanknoteIssue
+
+class BanknoteIssueAdmin(CopyIssueAdminAbstract):
+    form = BanknoteIssueAdminForm
+    inlines = (BanknoteInline,)
+    fieldsets = (
+        (_('Main information'), {
+            'classes': ('wide',),
+            'fields': (
+                'name',
+                ('nominal', 'type'),
+                ('country', 'currency'),
+                ('year', 'date_issue'),
+                ('series', 'catalog_number')
+            )
+        }),
+        (_('Physical parameters'), {
+            'classes': ('wide',),
+            'fields': (
+                ('height', 'weight'),
+            )
+        }),
+        (_('Description'), {
+            'classes': ('wide',),
+            'fields': (
+                ('image_obverse', 'image_reverse'),
+                'desc', 'desc_obverse', 'desc_reverse'
+            )
+        })
+    )
+
+class CopyAdminAbstract(CoinAbstractModelAdmin):
+    list_display = ('issue', 'in_album', 'packaged', 'booked')
     list_editable = ('in_album', 'packaged', 'booked')
     list_filter = ('in_album', 'packaged', 'booked')
     search_fields = ('issue__name',)
-    actions = (print_boxes_not_packed, print_boxes_all)
 
-    formfield_overrides = {
-        models.ImageField: {
-            'widget': AdminImageFileWidget
-        },
-    }
+class CoinAdmin(CopyAdminAbstract):
+    actions = (print_boxes_not_packed, print_boxes_all)
+    fields = (
+        'collection', 'grade',
+        ('mint', 'mint_mark'),
+        ('in_album', 'packaged', 'booked'),
+        ('image_obverse', 'image_reverse'),
+        'features'
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(CoinAdmin, self).__init__(*args, **kwargs)
+        self.list_display += ('show_mint',)
 
     def show_mint(self, model):
         if model.mint_mark:
@@ -223,12 +272,25 @@ class CoinAdmin(CoinAbstractModelAdmin):
         return model.mint
     show_mint.short_description = _('Mint')
 
+class BanknoteAdmin(CopyAdminAbstract):
+    fields = (
+        'collection', 'grade',
+        ('in_album', 'packaged', 'booked'),
+        ('image_obverse', 'image_reverse'),
+        'features'
+    )
+
 admin.site.register(Collection, CollectionAdmin)
+admin.site.register(Mint, MintAdmin)
+
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Currency, CurrencyAdmin)
+
 admin.site.register(CoinIssue, CoinIssueAdmin)
-admin.site.register(Mint, MintAdmin)
+admin.site.register(BanknoteIssue, BanknoteIssueAdmin)
+
 admin.site.register(Coin, CoinAdmin)
+admin.site.register(Banknote, BanknoteAdmin)
 
 admin.site.register(MintMark)
 admin.site.register(Series)

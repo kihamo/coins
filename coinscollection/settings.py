@@ -156,6 +156,13 @@ INSTALLED_APPS = (
     'coins',
 )
 
+CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
+
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 CONSTANCE_CONFIG = {
     'DEFAULT_ISSUE_COUNTRY': ('RUS', _('Default issue country')),

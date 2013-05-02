@@ -1,6 +1,8 @@
 Django>=1.5.1
 django-admin-tools>=0.5.1
 django-database-storage>=0.1.2
+django-constance>=0.6
+django-picklefield>=0.3.0
 pil>=1.1.7
 reportlab>=2.7
 South>=0.7.6

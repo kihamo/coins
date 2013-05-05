@@ -2,6 +2,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse, Http404
 
 from models import Coin
+from django.db.models.loading import get_model
 
 from PIL import Image
 from reportlab.graphics.barcode import createBarcodeDrawing
@@ -39,9 +40,10 @@ def image(request, filename, width=None, height=None, image_format='png'):
 
     return response
 
-def barcode(request, coin_id, barcode_format='code128', image_format='png'):
+def barcode(request, model_name, coin_id, barcode_format='code128', image_format='png'):
     try:
-        coin = Coin.objects.get(pk = coin_id)
+        model = get_model(Coin._meta.app_label, model_name[0].upper() + model_name[1:].lower())
+        model = model.objects.get(pk = coin_id)
     except Coin.DoesNotExist:
         raise Http404
 
@@ -53,7 +55,7 @@ def barcode(request, coin_id, barcode_format='code128', image_format='png'):
     if barcode_format == 'qr':
         barcode = createBarcodeDrawing(
             'QR',
-            value = coin.qr_code,
+            value = model.qr_code,
             barHeight = 90,
             barWidth = 90,
             barBorder = 0
@@ -61,7 +63,7 @@ def barcode(request, coin_id, barcode_format='code128', image_format='png'):
     else:
         barcode = createBarcodeDrawing(
             'Code128',
-            value = str(coin.barcode),
+            value = str(model.barcode),
             barWidth = 1,
             quiet = False
         )

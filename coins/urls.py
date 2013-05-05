@@ -8,7 +8,7 @@ urlpatterns = patterns('',
         views.image
     ),
     url(
-        r'^barcode\/(\d+)(?:[.](qr|code128))?(?:[.](jpg|jpeg|png|gif))?$',
+        r'^(?i)(coin|banknote)\/barcode\/(\d+)(?:[.](qr|code128))?(?:[.](jpg|jpeg|png|gif))?$',
         views.barcode
     ),
     url(

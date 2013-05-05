@@ -477,7 +477,8 @@ class CopyAbstract(CoinAbstract):
         if issue.country:
             country_iso = issue.country.iso
 
-        return 'Nominal: %g %s Year: %d Country: %s Url: %s' % (
+        return '%s Nominal: %g %s Year: %d Country: %s Url: %s' % (
+            self.__class__.__name__,
             issue.nominal,
             issue.currency.iso,
             issue.year,

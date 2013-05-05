@@ -56,15 +56,15 @@ class CopyInline(admin.StackedInline):
         if not model.id or not model.issue:
             return ''
 
-        url = reverse(barcode_view, args=[model.id, type])
+        url = reverse(barcode_view, args=[model.__class__.__name__.lower(), model.id, type])
         return '<img src="%s" alt="%s"/>' % (url, ugettext('Barcode'))
 
-    def barcode(self, coin):
-        return self._show_barcode_image(coin, 'code128')
+    def barcode(self, model):
+        return self._show_barcode_image(model, 'code128')
     barcode.allow_tags = True
 
-    def qr_code(self, coin):
-        return self._show_barcode_image(coin, 'qr')
+    def qr_code(self, model):
+        return self._show_barcode_image(model, 'qr')
     qr_code.allow_tags = True
 
 class CoinInline(CopyInline):

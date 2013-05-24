@@ -193,7 +193,8 @@ class CoinIssueAdmin(CopyIssueAdminAbstract):
                 ('nominal', 'type'),
                 ('country', 'currency'),
                 ('year', 'date_issue'),
-                ('series', 'catalog_number')
+                ('series', 'catalog_number'),
+                ('mintage')
             )
         }),
         (_('Physical parameters'), {
@@ -227,7 +228,8 @@ class BanknoteIssueAdmin(CopyIssueAdminAbstract):
                 ('nominal', 'type'),
                 ('country', 'currency'),
                 ('year', 'date_issue'),
-                ('series', 'catalog_number')
+                ('series', 'catalog_number'),
+                ('mintage')
             )
         }),
         (_('Physical parameters'), {

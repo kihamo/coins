@@ -208,7 +208,8 @@ class CoinIssueAdmin(CopyIssueAdminAbstract):
             'classes': ('wide',),
             'fields': (
                 ('image_obverse', 'image_reverse'),
-                'desc', 'desc_obverse', 'desc_reverse'
+                ('desc_obverse', 'desc_reverse'),
+                'desc',
             )
         })
     )

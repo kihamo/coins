@@ -293,6 +293,3 @@ admin.site.register(BanknoteIssue, BanknoteIssueAdmin)
 
 admin.site.register(Coin, CoinAdmin)
 admin.site.register(Banknote, BanknoteAdmin)
-
-admin.site.register(MintMark)
-admin.site.register(Series)

@@ -346,7 +346,7 @@ class Command(BaseCommand):
 
                 # coin type
                 info['type'] = CoinIssue.TYPES_CHOICES[0][0]
-                if int(info['catalog_number'][0]) in [3, 5] and int(info['catalog_number'][1]) in [1, 2, 3, 6]:
+                if int(info['catalog_number'][0]) in [3, 5] and int(info['catalog_number'][1]) in [1, 2, 3, 4, 6]:
                     info['type'] = CoinIssue.TYPES_CHOICES[2][0]
 
                 self._save_coin(info)

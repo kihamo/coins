@@ -142,7 +142,7 @@ class CopyIssueAdminAbstract(CoinAbstractModelAdmin):
     list_display_links = ('name',)
     list_filter = ('type', 'year')
     search_fields = ('name', 'catalog_number')
-    readonly_fields = ('catalog_number',)
+    readonly_fields = ('show_catalog_number',)
 
     def show_nominal(self, model):
         if model.currency.sign:
@@ -160,6 +160,18 @@ class CopyIssueAdminAbstract(CoinAbstractModelAdmin):
         return ''
     show_image_reverse.allow_tags = True
     show_image_reverse.short_description = _('Reverse')
+
+    def show_catalog_number(self, model):
+        print '<a href="http://cbr.ru/bank-notes_coins/Base_of_memorable_coins/ShowCoins.aspx?cat_num=%s" target="_blank" />'\
+                   % model.catalog_number
+
+        if model.catalog_number and model.currency and model.currency.iso == 'RUB':
+            return '<a href="http://cbr.ru/bank-notes_coins/Base_of_memorable_coins/ShowCoins.aspx?cat_num=%s" target="_blank" />%s</a>'\
+                   % (model.catalog_number, model.catalog_number)
+
+        return model.catalog_number
+    show_catalog_number.allow_tags = True
+    show_catalog_number.short_description = _('Catalog number')
 
     def get_urls(self):
         """
@@ -193,7 +205,7 @@ class CoinIssueAdmin(CopyIssueAdminAbstract):
                 ('nominal', 'type'),
                 ('country', 'currency'),
                 ('year', 'date_issue'),
-                ('series', 'catalog_number'),
+                ('series', 'show_catalog_number'),
                 ('mintage')
             )
         }),
@@ -229,7 +241,7 @@ class BanknoteIssueAdmin(CopyIssueAdminAbstract):
                 ('nominal', 'type'),
                 ('country', 'currency'),
                 ('year', 'date_issue'),
-                ('series', 'catalog_number'),
+                ('series', 'show_catalog_number'),
                 ('mintage')
             )
         }),

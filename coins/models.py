@@ -219,6 +219,7 @@ class CopyIssueAbstract(CoinAbstract):
     TYPES_CHOICES = (
         (1, _('Commemorative')),
         (2, _('Regular')),
+        (3, _('Investment')),
     )
 
     name = models.CharField(

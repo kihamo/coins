@@ -162,9 +162,6 @@ class CopyIssueAdminAbstract(CoinAbstractModelAdmin):
     show_image_reverse.short_description = _('Reverse')
 
     def show_catalog_number(self, model):
-        print '<a href="http://cbr.ru/bank-notes_coins/Base_of_memorable_coins/ShowCoins.aspx?cat_num=%s" target="_blank" />'\
-                   % model.catalog_number
-
         if model.catalog_number and model.currency and model.currency.iso == 'RUB':
             return '<a href="http://cbr.ru/bank-notes_coins/Base_of_memorable_coins/ShowCoins.aspx?cat_num=%s" target="_blank" />%s</a>'\
                    % (model.catalog_number, model.catalog_number)

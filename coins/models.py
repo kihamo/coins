@@ -176,6 +176,7 @@ class Mint(CoinAbstract):
         db_table = 'coins_mints'
         verbose_name = _('mint')
         verbose_name_plural = _('mints')
+        ordering = ['name']
 
 class MintMark(CoinAbstract):
     mark = models.CharField(
@@ -192,6 +193,7 @@ class MintMark(CoinAbstract):
         db_table = 'coins_mint_marks'
         verbose_name = _('mark mint')
         verbose_name_plural = _('marks mints')
+        ordering = ['mark']
 
     def save(self, **kwargs):
         self.mark = self.mark.upper()
@@ -211,6 +213,7 @@ class Series(CoinAbstract):
         db_table = 'coins_series'
         verbose_name = _('series')
         verbose_name_plural = _('series')
+        ordering = ['name']
 
 class CopyIssueAbstract(CoinAbstract):
     class Meta:

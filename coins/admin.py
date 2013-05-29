@@ -105,6 +105,10 @@ class MintAdmin(CoinAbstractModelAdmin):
         return ''
     show_country.short_description = _('Country')
 
+class MintMarkAdmin(CoinAbstractModelAdmin):
+    list_display = ('mark', 'mint')
+    list_display_links = ('mark',)
+
 class CountryAdmin(CoinAbstractModelAdmin):
     list_display = ('iso', 'name', 'current_currency')
     list_display_links = ('name',)
@@ -294,6 +298,7 @@ class BanknoteAdmin(CopyAdminAbstract):
 
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Mint, MintAdmin)
+admin.site.register(MintMark, MintMarkAdmin)
 
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Currency, CurrencyAdmin)

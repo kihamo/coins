@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from django.core.management import base
-from django.utils.termcolors import make_style
-from coins.models import Country, Currency, CurrencyHistory
-from lxml.html import parse
-import dateutil.parser
+from django.core.management.base import BaseCommand, CommandError
 
 import re
+
+from urllib import urlencode
+import urllib2
+
+from coins.models import Country, Currency, CurrencyHistory
+from datetime import datetime
+
+from lxml.etree import parse, HTMLParser
 
 # www.globalfinancialdata.com/news/GHC_Histories.xls
 # manage.py dumpdata --format=json coins.Country coins.Currency coins.CurrencyHistory > coins/fixtures/country_currency.json
 
-class Command(base.BaseCommand):
+class Command(BaseCommand):
     help = 'Import countries and currency'
 
     _base_url = 'http://www.unicode.org/repos/cldr/trunk/common'
@@ -19,39 +23,83 @@ class Command(base.BaseCommand):
 
     def __init__(self):
         super(Command, self).__init__()
-        self.style.IMPORT_VALUE = make_style(fg='cyan', opts=('bold',))
+
+        opener = urllib2.build_opener(urllib2.HTTPHandler(debuglevel=0))
+        opener.addheaders = [
+            ('User-agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1490.2 Safari/537.36')
+        ]
+        urllib2.install_opener(opener)
+
+    def _load_url(self, url, data=None):
+        self.stdout.write(self.style.HTTP_INFO('Load page %s' % url))
+
+        try:
+            if data:
+                data = urlencode(data)
+
+            content = urllib2.urlopen(url, data)
+        except Exception as e:
+            raise CommandError('Error "%s" load page %s' % (e, url))
+
+        root = parse(content, HTMLParser(encoding='utf-8'))
+        if not root:
+            raise CommandError('Error parse page %s' % url)
+
+        return root.getroot()
 
     def handle(self, year = None, *args, **options):
-        doc_main = parse('%s/main/ru.xml' % self._base_url)
-        doc_data = parse('%s/supplemental/supplementalData.xml' % self._base_url)
+        doc_main = self._load_url('%s/main/ru.xml' % self._base_url)
 
         # currency
         entities = doc_main.xpath('.//ldml/numbers/currencies/currency')
         for entity in entities:
-            iso = entity.attrib['type']
-            name = re.sub('\(.*\)', '', entity.xpath('.//displayname/text()')[0]).strip()
+            currency, created = Currency.objects.get_or_create(
+                name = re.sub('\(.*\)', '', entity.xpath('.//displayname/text()')[0]).strip(),
+                iso = entity.attrib['type']
+            )
 
-            if self._save_model(Currency, iso, name):
-                self._print_message('Import currency "%s" [%s]', (name, iso))
+            if created:
+                self.stdout.write('Add currency "%s" (%s)' % (currency.name, currency.iso))
+
+        # currency symbols
+        doc_symbols = self._load_url('http://www.xe.com/symbols.php')
+        entities = doc_symbols.xpath('.//table[@class="cSymbl_tbl"]/tr[@class="row1" or @class="row2"]')
+        for entity in entities:
+            sign = entity.xpath('.//td[@class="cSmbl_Fnt_C2000"]/text()')
+            if sign:
+                iso = entity.xpath('.//td[2]/text()')[0]
+                try:
+                    object = Currency.objects.get(iso = iso)
+                    sign = sign[0]
+
+                    if not object.sign:
+                        object.sign = sign
+                        object.save()
+                        self.stdout.write('Set sign for currency "%s"' % object.iso)
+                except Currency.DoesNotExist:
+                    self.stderr.write('Currency %s not found' % iso)
 
         # country
+        doc_data = self._load_url('%s/supplemental/supplementalData.xml' % self._base_url)
         entities = doc_main.xpath('.//ldml/localedisplaynames/territories/territory[not(@alt)]')
         for entity in entities:
             iso = entity.attrib['type']
 
             if iso in self._ignore_regions:
-                self._print_message('Ignore country "%s"', (iso,), 'error')
+                self.stdout.write('Ignore country "%s"' % iso)
             elif len(iso) == 2:
                 country_entity = doc_data.xpath('.//supplementaldata/codemappings/territorycodes[@type="%s"][@alpha3]' % iso)
 
                 if country_entity:
-                    country_iso = country_entity[0].attrib['alpha3']
-                    name = re.sub('\(.*\)', '', entity.text).strip()
+                    country, created = Country.objects.get_or_create(
+                        name = re.sub('\(.*\)', '', entity.text).strip(),
+                        iso = country_entity[0].attrib['alpha3']
+                    )
 
-                    if self._save_model(Country, country_iso, name):
-                        self._print_message('Import country "%s" [%s]', (name, country_iso))
+                    if created:
+                        self.stdout.write('Add country "%s" (%s)' % (country.name, country.iso))
                 else:
-                    self._print_message('Not found country by iso 2 "%s"', (iso,), 'error')
+                    self.stderr.write('Not found country by iso 2 "%s"' % iso)
 
         # relations
         entities = doc_data.xpath('.//supplementaldata/currencydata/region')
@@ -60,7 +108,7 @@ class Command(base.BaseCommand):
             iso = entity.attrib['iso3166']
 
             if iso in self._ignore_regions:
-                self._print_message('Ignore currency country "%s"', (iso,), 'error')
+                self.stderr.write('Ignore currency country "%s"' % iso)
             else:
                 country_entity = doc_data.xpath('.//supplementaldata/codemappings/territorycodes[@type="%s"][@alpha3]' % entity.attrib['iso3166'])
 
@@ -69,32 +117,32 @@ class Command(base.BaseCommand):
 
                     try:
                         country_iso = country_entity[0].attrib['alpha3']
-                        country = Country.objects.get(iso=country_iso)
+                        country = Country.objects.get(iso = country_iso)
                     except:
-                        self._print_message('Not found country by iso "%s"', (country_iso,), 'error')
+                        self.stderr.write('Not found country by iso "%s"' % country_iso)
                     else:
                         for currency_entity in currency_entities:
                             currency_iso = currency_entity.attrib['iso4217']
 
                             try:
-                                currency = Currency.objects.get(iso=currency_iso)
+                                currency = Currency.objects.get(iso = currency_iso)
                             except:
-                                self._print_message('Not found currency by iso "%s"', (currency_iso,), 'error')
+                                self.stderr.write('Not found currency by iso "%s"' % currency_iso)
                             else:
                                 # current currency
                                 if not 'to' in currency_entity.attrib and 'from' in currency_entity.attrib and (not country.current_currency or not country.current_currency.iso == currency.iso):
                                     if country.current_currency:
-                                        self._print_message(
-                                            'Double current currency "%s" [%s] for country "%s" [%s]',
-                                            (currency, currency.iso, country, country.iso),
-                                            'error'
+                                        self.stderr.write(
+                                            'Double current currency "%s" [%s] for country "%s" [%s]' %
+                                            (currency.name, currency.iso, country.name, country.iso)
                                         )
                                     else:
                                         country.current_currency = currency
                                         country.save()
-                                        self._print_message(
-                                            'Import current country "%s" [%s] currency "%s" [%s]',
-                                            (country, country.iso, currency, currency.iso)
+
+                                        self.stdout.write(
+                                            'Import current country "%s" [%s] currency "%s" [%s]' %
+                                            (country.name, country.iso, currency.name, currency.iso)
                                         )
 
                                 # currency history
@@ -102,39 +150,17 @@ class Command(base.BaseCommand):
                                     history = CurrencyHistory(country = country, currency = currency)
 
                                     if 'to' in currency_entity.attrib:
-                                        history.date_to = dateutil.parser.parse(currency_entity.attrib['to']).date()
+                                        history.date_to = datetime.strptime(currency_entity.attrib['to'], '%Y-%m-%d')
 
                                     if 'from' in currency_entity.attrib:
-                                        history.date_from = dateutil.parser.parse(currency_entity.attrib['from']).date()
+                                        history.date_from = datetime.strptime(currency_entity.attrib['from'], '%Y-%m-%d')
 
                                     history.save()
-                                    self._print_message(
-                                        'Import history currency "%s" [%s] currency "%s" [%s]',
-                                        (country, country.iso, currency, currency.iso)
+
+                                    self.stdout.write(
+                                        'Import history currency "%s" [%s] country "%s" [%s]' %
+                                        (currency.name, currency.iso, country.name, country.iso)
                                     )
                             currency.save()
                 else:
-                    self._print_message('Not found region country by iso 2 "%s"', (entity.attrib['iso3166'],), 'error')
-
-    def _save_model(self, model, iso, name):
-        try:
-            object = model.objects.get(iso=iso)
-
-            if not object.name == name:
-                object.name = name
-                object.save()
-                return True
-
-        except model.DoesNotExist:
-            model.objects.create(iso=iso, name=name)
-            return True
-
-        return False
-
-    def _print_message(self, template, args, type = 'message'):
-        print_args = []
-        for arg in args:
-            print_args.append(self.style.IMPORT_VALUE(u'%s' % arg))
-
-        out = type == 'error' and self.stderr or self.stdout
-        out.write(template % tuple(print_args))
+                    self.stderr.write('Not found region country by iso 2 "%s"' % entity.attrib['iso3166'])

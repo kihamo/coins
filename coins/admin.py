@@ -116,7 +116,7 @@ class CountryAdmin(CoinAbstractModelAdmin):
     inlines = (CurrencyHistoryInline,)
 
 class CurrencyAdmin(CoinAbstractModelAdmin):
-    list_display = ('iso', 'name')
+    list_display = ('iso', 'name', 'sign')
     list_display_links = ('name',)
     search_fields = ['iso', 'name']
     ordering = ['iso']

@@ -4,7 +4,6 @@
 
 import re
 from django.core.management.base import BaseCommand, CommandError
-from django.utils import termcolors
 
 from optparse import make_option
 from lxml.etree import parse, HTMLParser

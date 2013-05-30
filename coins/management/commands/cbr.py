@@ -48,12 +48,7 @@ class Command(BaseCommand):
 
     _main_information_mapping = {
         u'каталожный номер'     : 'catalog_number',
-        u'дата выпуска'         : 'date_issue',
-        u'серия'                : 'series',
-        u'географическая серия' : 'series',
-        u'историческая серия'   : 'series',
-        u'спортивная серия'     : 'series',
-        u'набор памятных монет' : 'series'
+        u'дата выпуска'         : 'date_issue'
     }
     _main_params_mapping = {
         u'сплав'          : 'alloy',
@@ -200,6 +195,8 @@ class Command(BaseCommand):
                                 info['name'] = string
 
                             continue
+                        elif node.tag == 'b':
+                            info['series'] = match.group(2)
 
                         key = match.group(1).lower().replace('c', u'с')
                         if not key in self._main_information_mapping:
@@ -337,7 +334,7 @@ class Command(BaseCommand):
                 # remove double whitespace
                 for key in info:
                     if isinstance(info[key], type(u'')):
-                        info[key] = re.sub('[ \t\r\f\v]+', ' ', info[key])
+                        info[key] = re.sub('[ \t\r\f\v]+', ' ', info[key].strip('"\''))
                         info[key] = re.sub('\n+', '\n', info[key])
 
                 # type juggling

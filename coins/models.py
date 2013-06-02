@@ -311,6 +311,10 @@ class CopyIssueAbstract(CoinAbstract):
     copy_booked_count.short_description = _('Booked copies count')
 
 class CoinIssue(CopyIssueAbstract):
+    mints = models.ManyToManyField(
+        Mint,
+        through='IssueMint'
+    )
     diameter = models.DecimalField(
         _('Diameter'),
         help_text=_('Diameter in millimeters'),

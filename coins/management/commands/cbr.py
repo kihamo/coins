@@ -402,7 +402,7 @@ class Command(BaseCommand):
         issue.save()
 
         # save mints
-        if 'mint' in info:
+        if 'mint' in info and not issue.mints.count():
             for mint_info in info['mint']:
                 # http://cbr.ru/bank-notes_coins/Base_of_memorable_coins/ShowCoins.aspx?cat_num=5109-0079
                 mint_info['name'] = mint_info['name'].split(':')[-1].strip()

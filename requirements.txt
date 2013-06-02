@@ -5,6 +5,7 @@ django-constance>=0.6
 django-picklefield>=0.3.0
 South>=0.8.1
 docutils>=0.10
+django-debug-toolbar>=0.9.4
 
 # stable version django-admin-tools
 # django-admin-tools>=0.5.1

@@ -419,6 +419,12 @@ class IssueMint(CoinAbstract):
         verbose_name = _('mint')
         verbose_name_plural = _('mints')
 
+    def __unicode__(self):
+        if self.mint_mark:
+            return '%s (%s)' % (self.mint, self.mint_mark)
+
+        return self.mint
+
 class CopyAbstract(CoinAbstract):
     class Meta:
         abstract = True
@@ -509,14 +515,8 @@ class Coin(CopyAbstract):
         verbose_name=_('Issue')
     )
     mint = models.ForeignKey(
-        Mint,
+        IssueMint,
         verbose_name=_('Mint'),
-        blank=True,
-        null=True
-    )
-    mint_mark = models.ForeignKey(
-        MintMark,
-        verbose_name=_('Mint mark'),
         blank=True,
         null=True
     )

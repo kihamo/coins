@@ -71,12 +71,22 @@ class CoinInline(CopyInline):
     model = Coin
     fields = (
         ('barcode', 'qr_code'),
-        'collection', 'grade',
-        ('mint', 'mint_mark'),
+        'collection', 'mint', 'grade',
         ('in_album', 'packaged', 'booked'),
         ('image_obverse', 'image_reverse'),
         'features'
     )
+
+    def get_formset(self, request, obj=None, **kwargs):
+        self.obj = obj
+        return super(CoinInline, self).get_formset(request, obj, **kwargs)
+
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        if db_field.name == 'mint' and hasattr(self, 'obj') and self.obj:
+            kwargs['queryset'] = IssueMint.objects.filter(issue = self.obj)
+            return db_field.formfield(**kwargs)
+
+        return super(CoinInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 class BanknoteInline(CopyInline):
     model = Banknote
@@ -270,23 +280,11 @@ class CopyAdminAbstract(CoinAbstractModelAdmin):
 class CoinAdmin(CopyAdminAbstract):
     actions = (print_boxes_not_packed, print_boxes_all)
     fields = (
-        'collection', 'grade',
-        ('mint', 'mint_mark'),
+        'collection', 'grade', 'mint',
         ('in_album', 'packaged', 'booked'),
         ('image_obverse', 'image_reverse'),
         'features'
     )
-
-    def __init__(self, *args, **kwargs):
-        super(CoinAdmin, self).__init__(*args, **kwargs)
-        self.list_display += ('show_mint',)
-
-    def show_mint(self, model):
-        if model.mint_mark:
-            return '%s (%s)' % (model.mint_mark.mark, model.mint_mark.mint)
-
-        return model.mint
-    show_mint.short_description = _('Mint')
 
 class BanknoteAdmin(CopyAdminAbstract):
     fields = (

@@ -156,6 +156,9 @@ INSTALLED_APPS = (
     'coins',
 )
 
+ADMIN_TOOLS_INDEX_DASHBOARD = 'coins.dashboard.CustomIndexDashboard'
+ADMIN_TOOLS_APP_INDEX_DASHBOARD = 'coins.dashboard.CustomAppIndexDashboard'
+
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 CACHES = {
     'default': {

@@ -296,15 +296,16 @@ class BanknoteAdmin(CopyAdminAbstract):
         'features'
     )
 
-admin.site.register(Collection, CollectionAdmin)
+admin.site.register(CoinIssue, CoinIssueAdmin)
+admin.site.register(Coin, CoinAdmin)
 admin.site.register(Mint, MintAdmin)
 admin.site.register(MintMark, MintMarkAdmin)
+
+admin.site.register(BanknoteIssue, BanknoteIssueAdmin)
+admin.site.register(Banknote, BanknoteAdmin)
 
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Currency, CurrencyAdmin)
 
-admin.site.register(CoinIssue, CoinIssueAdmin)
-admin.site.register(BanknoteIssue, BanknoteIssueAdmin)
-
-admin.site.register(Coin, CoinAdmin)
-admin.site.register(Banknote, BanknoteAdmin)
+admin.site.register(Collection, CollectionAdmin)
+admin.site.register(Series)

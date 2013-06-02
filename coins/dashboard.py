@@ -66,11 +66,13 @@ class CustomIndexDashboard(Dashboard):
                     'title': _('Commemorative and Investment Coins database'),
                     'url': 'http://cbr.ru/bank-notes_coins/?Prtid=coins_base',
                     'external': True,
+                    'attrs': {'target': '_blank'},
                 },
                 {
                     'title': _('Collection list in google docs'),
                     'url': 'https://docs.google.com/a/kihamo.ru/spreadsheet/ccc?key=0AlUZ0Eqd4UJwdEZRTHVWMVFCcW5TX0JqSGh2ZGptS1E&usp=sharing',
                     'external': True,
+                    'attrs': {'target': '_blank'},
                 }
             ]
         ))
@@ -135,11 +137,13 @@ class CustomAppIndexDashboard(AppIndexDashboard):
                         'title': _('Commemorative and Investment Coins database'),
                         'url': 'http://cbr.ru/bank-notes_coins/?Prtid=coins_base',
                         'external': True,
+                        'attrs': {'target': '_blank'},
                     },
                     {
                         'title': _('Collection list in google docs'),
                         'url': 'https://docs.google.com/a/kihamo.ru/spreadsheet/ccc?key=0AlUZ0Eqd4UJwdEZRTHVWMVFCcW5TX0JqSGh2ZGptS1E&usp=sharing',
                         'external': True,
+                        'attrs': {'target': '_blank'},
                     }
                 ]
             ),

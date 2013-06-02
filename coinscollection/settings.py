@@ -9,7 +9,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    ('Kihamo', 'info@kihamo.ru')
+    ('Kihamo', 'coins@kihamo.ru')
 )
 
 MANAGERS = ADMINS

@@ -196,6 +196,7 @@ class Command(BaseCommand):
                             continue
                         elif node.tag == 'b':
                             info['series'] = match.group(2)
+                            continue
 
                         key = match.group(1).lower().replace('c', u'с')
                         if not key in self._main_information_mapping:

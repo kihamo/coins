@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 
 from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse
+from django.db.models.query import EmptyQuerySet
 
 from django.contrib import admin
 from django.forms import ModelForm
@@ -78,15 +79,13 @@ class CoinInline(CopyInline):
     )
 
     def get_formset(self, request, obj=None, **kwargs):
-        self.obj = obj
-        return super(CoinInline, self).get_formset(request, obj, **kwargs)
+        formset = super(CoinInline, self).get_formset(request, obj, **kwargs)
+        if obj:
+            formset.form.base_fields['mint'].queryset = IssueMint.objects.filter(issue = obj)
+        else:
+            formset.form.base_fields['mint'].queryset = EmptyQuerySet()
 
-    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
-        if db_field.name == 'mint' and hasattr(self, 'obj') and self.obj:
-            kwargs['queryset'] = IssueMint.objects.filter(issue = self.obj)
-            return db_field.formfield(**kwargs)
-
-        return super(CoinInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return formset
 
 class BanknoteInline(CopyInline):
     model = Banknote

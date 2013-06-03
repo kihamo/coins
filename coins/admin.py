@@ -80,10 +80,15 @@ class CoinInline(CopyInline):
 
     def get_formset(self, request, obj=None, **kwargs):
         formset = super(CoinInline, self).get_formset(request, obj, **kwargs)
+        mint_field = formset.form.base_fields['mint']
+
         if obj:
-            formset.form.base_fields['mint'].queryset = IssueMint.objects.filter(issue = obj)
+            mint_field.queryset = IssueMint.objects.filter(issue = obj)
+
+            if mint_field.queryset.count():
+                mint_field.initial = mint_field.queryset[0].id
         else:
-            formset.form.base_fields['mint'].queryset = EmptyQuerySet()
+            mint_field.queryset = EmptyQuerySet()
 
         return formset
 

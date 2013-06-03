@@ -1,15 +1,17 @@
-# Django settings for coinscollection project.
 import os
 from django.utils.translation import ugettext_lazy as _
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 ROOT_PATH = os.path.abspath(os.path.dirname(PROJECT_PATH))
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
+SERVER_EMAIL = 'coins@kihamo.ru'
+DEFAULT_FROM_EMAIL = SERVER_EMAIL
+
 ADMINS = (
-    ('Kihamo', 'coins@kihamo.ru')
+    ('Kihamo', SERVER_EMAIL)
 )
 
 MANAGERS = ADMINS
@@ -191,7 +193,7 @@ LOGGING = {
     },
     'handlers': {
         'mail_admins': {
-            'level': 'ERROR',
+            'level': 'WARNING',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         }
@@ -199,10 +201,13 @@ LOGGING = {
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins'],
-            'level': 'ERROR',
+            'level': 'WARNING',
             'propagate': True,
         },
     }
 }
 
+SEND_BROKEN_LINK_EMAILS = True
+
 INTERNAL_IPS = ('127.0.0.1',)
+ALLOWED_HOSTS = ['*']

@@ -73,7 +73,8 @@ class CoinInline(CopyInline):
     fields = (
         ('barcode', 'qr_code'),
         'collection', 'mint', 'grade',
-        ('in_album', 'packaged', 'booked'),
+        ('packaged', 'booked'),
+        ('album', 'page', 'division'),
         ('image_obverse', 'image_reverse'),
         'features'
     )
@@ -97,7 +98,7 @@ class BanknoteInline(CopyInline):
     fields = (
         ('barcode', 'qr_code'),
         'collection', 'grade',
-        ('in_album', 'packaged', 'booked'),
+        ('packaged', 'booked'),
         ('image_obverse', 'image_reverse'),
         'features'
     )
@@ -156,7 +157,7 @@ class CopyIssueAdminForm(ModelForm):
         super(CopyIssueAdminForm, self).__init__(*args, **kwargs)
 
 class CopyIssueAdminAbstract(CoinAbstractModelAdmin):
-    list_display = ('show_image_reverse', 'name', 'show_nominal', 'year', 'copy_count', 'copy_booked_count')
+    list_display = ('show_image', 'name', 'show_nominal', 'year', 'copy_count', 'copy_booked_count')
     list_display_links = ('name',)
     list_filter = ('type', 'year')
     search_fields = ('name', 'catalog_number')
@@ -171,13 +172,14 @@ class CopyIssueAdminAbstract(CoinAbstractModelAdmin):
         return model.nominal
     show_nominal.short_description = _('Nominal')
 
-    def show_image_reverse(self, model):
-        if model.image_reverse:
-            return '<img src="%s" alt="%s" />' % (model.image_reverse.get_url(100, 100), model)
+    def show_image(self, model):
+        image = model.image_reverse or model.image_obverse
+        if image:
+            return '<img src="%s" alt="%s" />' % (image.get_url(100, 100), model)
 
         return ''
-    show_image_reverse.allow_tags = True
-    show_image_reverse.short_description = _('Reverse')
+    show_image.allow_tags = True
+    show_image.short_description = _('Image')
 
     def show_catalog_number(self, model):
         if model.catalog_number and model.currency and model.currency.iso == 'RUB':
@@ -276,16 +278,41 @@ class BanknoteIssueAdmin(CopyIssueAdminAbstract):
     )
 
 class CopyAdminAbstract(CoinAbstractModelAdmin):
-    list_display = ('issue', 'in_album', 'packaged', 'booked')
-    list_editable = ('in_album', 'packaged', 'booked')
-    list_filter = ('in_album', 'packaged', 'booked')
+    list_display = ('show_image', 'issue', 'nominal', 'year', 'in_album', 'packaged', 'booked')
+    list_display_links = ('issue',)
+    list_editable = ('packaged', 'booked')
+    list_filter = ('packaged', 'booked')
     search_fields = ('issue__name',)
+
+    def show_image(self, model):
+        image = model.image_reverse or model.image_obverse or model.issue.image_reverse or model.issue.image_obverse
+        if image:
+            return '<img src="%s" alt="%s" />' % (image.get_url(100, 100), model)
+
+        return ''
+    show_image.allow_tags = True
+    show_image.short_description = _('Image')
+
+    def nominal(self, model):
+        model = model.issue
+        if model.currency.sign:
+           return '%g %s' % (model.nominal, model.currency.sign)
+        elif model.currency.iso:
+           return '%g %s' % (model.nominal, model.currency.iso)
+
+        return model.nominal
+    nominal.short_description = _('Nominal')
+
+    def year(self, model):
+        return model.issue.year
+    nominal.short_description = _('Year')
 
 class CoinAdmin(CopyAdminAbstract):
     actions = (print_boxes_not_packed, print_boxes_all)
     fields = (
         'collection', 'grade', 'mint',
-        ('in_album', 'packaged', 'booked'),
+        ('packaged', 'booked'),
+        ('album', 'page', 'division'),
         ('image_obverse', 'image_reverse'),
         'features'
     )
@@ -293,7 +320,7 @@ class CoinAdmin(CopyAdminAbstract):
 class BanknoteAdmin(CopyAdminAbstract):
     fields = (
         'collection', 'grade',
-        ('in_album', 'packaged', 'booked'),
+        ('packaged', 'booked'),
         ('image_obverse', 'image_reverse'),
         'features'
     )

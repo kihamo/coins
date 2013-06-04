@@ -1,4 +1,5 @@
 from django.db.models.fields.files import ImageFieldFile, ImageField
+from south.modelsinspector import add_introspection_rules
 
 class CoinImageFieldFile(ImageFieldFile):
     def get_url(self, thumb_width = None, thumb_height = None, thumb_format = None):
@@ -43,3 +44,5 @@ class CoinImageField(ImageField):
 
     def generate_filename(self, instance, name):
         return name
+
+add_introspection_rules([], ['^coins\.utils\.fields\.CoinImageField'])

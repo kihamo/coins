@@ -4,7 +4,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from coins.utils.models import CoinImageField
+from coins.utils.fields import CoinImageField
 
 class CoinAbstract(models.Model):
     class Meta:
@@ -450,9 +450,6 @@ class CopyAbstract(CoinAbstract):
         blank=True,
         null=True
     )
-    in_album = models.BooleanField(
-        _('In albums')
-    )
     packaged = models.BooleanField(
         _('Packaged')
     )
@@ -464,9 +461,29 @@ class CopyAbstract(CoinAbstract):
         blank=True,
         null=True
     )
+    album = models.PositiveIntegerField(
+        _('Album number'),
+        blank=True,
+        null=True
+    )
+    page = models.PositiveIntegerField(
+        _('Page number'),
+        blank=True,
+        null=True
+    )
+    division = models.PositiveIntegerField(
+        _('Division number'),
+        blank=True,
+        null=True
+    )
 
     def get_absolute_url(self):
         return "/coin/%s/" % self.barcode
+
+    def in_album(self):
+        return bool(self.album) and bool(self.page) and bool(self.division)
+    in_album.boolean = True
+    in_album.short_description = _('In album')
 
     @property
     def barcode(self):
@@ -505,7 +522,7 @@ class CopyAbstract(CoinAbstract):
         return self.issue.name
 
     def save(self, *args, **kwargs):
-        if self.in_album and not self.packaged:
+        if self.in_album() and not self.packaged:
             self.packaged = True
 
         super(CopyAbstract, self).save(*args, **kwargs)

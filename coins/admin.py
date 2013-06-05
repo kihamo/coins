@@ -278,10 +278,13 @@ class BanknoteIssueAdmin(CopyIssueAdminAbstract):
     )
 
 class CopyAdminAbstract(CoinAbstractModelAdmin):
-    list_display = ('show_image', 'issue', 'nominal', 'year', 'in_album', 'packaged', 'booked')
+    list_display = (
+        'show_image', 'issue', 'nominal', 'year', 'packaged', 'booked',
+        'in_album', 'album', 'page', 'division'
+    )
     list_display_links = ('issue',)
-    list_editable = ('packaged', 'booked')
-    list_filter = ('packaged', 'booked')
+    list_editable = ('packaged', 'booked', 'album', 'page', 'division')
+    list_filter = ('packaged', 'booked', 'album')
     search_fields = ('issue__name',)
 
     def show_image(self, model):

@@ -108,7 +108,7 @@ class Currency(IsoAbstract):
 
     def __unicode__(self):
         if self.sign and len(self.sign):
-            return '%s (%s)' % (self.name, self.sign)
+            return u'%s (%s)' % (self.name, self.sign)
 
         return self.name
 
@@ -421,7 +421,7 @@ class IssueMint(CoinAbstract):
 
     def __unicode__(self):
         if self.mint_mark:
-            return '%s (%s)' % (self.mint, self.mint_mark)
+            return u'%s (%s)' % (self.mint, self.mint_mark)
 
         return self.mint
 

@@ -106,8 +106,20 @@ class BanknoteInline(CopyInline):
 
 # -------- General --------
 class CollectionAdmin(CoinAbstractModelAdmin):
-    list_display = ('name', 'coins_count', 'banknotes_count')
+    list_display = ('name', 'coins_count_link', 'banknotes_count_link')
     list_display_links = ('name',)
+
+    def coins_count_link(self, model):
+        url = reverse('admin:coins_coin_changelist')
+        return '<a href="%s?collection=%s">%s</a>' % (url, model.id, model.coins_count())
+    coins_count_link.allow_tags = True
+    coins_count_link.short_description = _('Coins count')
+
+    def banknotes_count_link(self, model):
+        url = reverse('admin:coins_banknote_changelist')
+        return '<a href="%s?collection=%s">%s</a>' % (url, model.id, model.banknotes_count())
+    banknotes_count_link.allow_tags = True
+    banknotes_count_link.short_description = _('Banknotes count')
 
 class MintAdmin(CoinAbstractModelAdmin):
     list_display = ('show_country', 'name')

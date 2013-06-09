@@ -99,6 +99,7 @@ class BanknoteInline(CopyInline):
         ('barcode', 'qr_code'),
         'collection', 'grade',
         ('packaged', 'booked'),
+        ('album', 'page', 'division'),
         ('image_obverse', 'image_reverse'),
         'features'
     )
@@ -308,7 +309,7 @@ class CopyAdminAbstract(CoinAbstractModelAdmin):
 
     def year(self, model):
         return model.issue.year
-    nominal.short_description = _('Year')
+    year.short_description = _('Year')
 
 class CoinAdmin(CopyAdminAbstract):
     actions = (print_boxes_not_packed, print_boxes_all)

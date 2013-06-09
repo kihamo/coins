@@ -303,12 +303,12 @@ class CopyIssueAbstract(CoinAbstract):
     )
 
     def copy_count(self):
-        pass
-    copy_count.short_description = _('Copy count')
+        return self._model_set.count()
+    copy_count.short_description = _('Copies')
 
     def copy_booked_count(self):
-        pass
-    copy_booked_count.short_description = _('Booked copies count')
+        return self._model_set.filter(booked=True).count()
+    copy_booked_count.short_description = _('Booked')
 
 class CoinIssue(CopyIssueAbstract):
     mints = models.ManyToManyField(
@@ -357,11 +357,9 @@ class CoinIssue(CopyIssueAbstract):
         verbose_name = _('coin issue')
         verbose_name_plural = _('coin issues')
 
-    def copy_count(self):
-        return self.coin_set.count()
-
-    def copy_booked_count(self):
-        return self.coin_set.filter(booked=True).count()
+    def __init__(self, *args, **kwargs):
+        super(CoinIssue, self).__init__(*args, **kwargs)
+        self._model_set = self.coin_set
 
 class BanknoteIssue(CopyIssueAbstract):
     weight = models.DecimalField(
@@ -386,11 +384,9 @@ class BanknoteIssue(CopyIssueAbstract):
         verbose_name = _('banknote issue')
         verbose_name_plural = _('banknote issues')
 
-    def copy_count(self):
-        return self.banknote_set.count()
-
-    def copy_booked_count(self):
-        return self.banknote_set.filter(booked=True).count()
+    def __init__(self, *args, **kwargs):
+        super(BanknoteIssue, self).__init__(*args, **kwargs)
+        self._model_set = self.banknote_set
 
 class IssueMint(CoinAbstract):
     issue = models.ForeignKey(
@@ -541,6 +537,7 @@ class Coin(CopyAbstract):
 
     class Meta(CoinAbstract.Meta):
         db_table = 'coins_coins'
+        unique_together = ('album', 'page', 'division')
         verbose_name = _('coin')
         verbose_name_plural = _('coins')
 
@@ -552,5 +549,6 @@ class Banknote(CopyAbstract):
 
     class Meta(CoinAbstract.Meta):
         db_table = 'coins_banknotes'
+        unique_together = ('album', 'page', 'division')
         verbose_name = _('banknote')
         verbose_name_plural = _('banknotes')

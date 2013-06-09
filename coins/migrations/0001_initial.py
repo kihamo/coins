@@ -141,14 +141,19 @@ class Migration(SchemaMigration):
             ('grade', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True, blank=True)),
             ('image_obverse', self.gf('coins.utils.fields.CoinImageField')(max_length=100, null=True, blank=True)),
             ('image_reverse', self.gf('coins.utils.fields.CoinImageField')(max_length=100, null=True, blank=True)),
-            ('in_album', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('packaged', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('booked', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('features', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('album', self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True)),
+            ('page', self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True)),
+            ('division', self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True)),
             ('issue', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['coins.CoinIssue'])),
             ('mint', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['coins.IssueMint'], null=True, blank=True)),
         ))
         db.send_create_signal(u'coins', ['Coin'])
+
+        # Adding unique constraint on 'Coin', fields ['album', 'page', 'division']
+        db.create_unique('coins_coins', ['album', 'page', 'division'])
 
         # Adding model 'Banknote'
         db.create_table('coins_banknotes', (
@@ -157,18 +162,28 @@ class Migration(SchemaMigration):
             ('grade', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True, blank=True)),
             ('image_obverse', self.gf('coins.utils.fields.CoinImageField')(max_length=100, null=True, blank=True)),
             ('image_reverse', self.gf('coins.utils.fields.CoinImageField')(max_length=100, null=True, blank=True)),
-            ('in_album', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('packaged', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('booked', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('features', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('album', self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True)),
+            ('page', self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True)),
+            ('division', self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True)),
             ('issue', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['coins.BanknoteIssue'])),
         ))
         db.send_create_signal(u'coins', ['Banknote'])
 
+        # Adding unique constraint on 'Banknote', fields ['album', 'page', 'division']
+        db.create_unique('coins_banknotes', ['album', 'page', 'division'])
+
         call_command('loaddata', 'country_currency.json')
 
-
     def backwards(self, orm):
+        # Removing unique constraint on 'Banknote', fields ['album', 'page', 'division']
+        db.delete_unique('coins_banknotes', ['album', 'page', 'division'])
+
+        # Removing unique constraint on 'Coin', fields ['album', 'page', 'division']
+        db.delete_unique('coins_coins', ['album', 'page', 'division'])
+
         # Deleting model 'Image'
         db.delete_table(u'coins_image')
 
@@ -211,17 +226,19 @@ class Migration(SchemaMigration):
 
     models = {
         u'coins.banknote': {
-            'Meta': {'object_name': 'Banknote', 'db_table': "'coins_banknotes'"},
+            'Meta': {'unique_together': "(('album', 'page', 'division'),)", 'object_name': 'Banknote', 'db_table': "'coins_banknotes'"},
+            'album': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'booked': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'collection': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['coins.Collection']"}),
+            'division': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'features': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'grade': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image_obverse': ('coins.utils.fields.CoinImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'image_reverse': ('coins.utils.fields.CoinImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'in_album': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'issue': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['coins.BanknoteIssue']"}),
-            'packaged': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+            'packaged': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'page': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'coins.banknoteissue': {
             'Meta': {'object_name': 'BanknoteIssue', 'db_table': "'coins_banknote_issues'"},
@@ -245,18 +262,20 @@ class Migration(SchemaMigration):
             'year': ('django.db.models.fields.IntegerField', [], {})
         },
         u'coins.coin': {
-            'Meta': {'object_name': 'Coin', 'db_table': "'coins_coins'"},
+            'Meta': {'unique_together': "(('album', 'page', 'division'),)", 'object_name': 'Coin', 'db_table': "'coins_coins'"},
+            'album': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'booked': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'collection': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['coins.Collection']"}),
+            'division': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'features': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'grade': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image_obverse': ('coins.utils.fields.CoinImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'image_reverse': ('coins.utils.fields.CoinImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'in_album': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'issue': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['coins.CoinIssue']"}),
             'mint': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['coins.IssueMint']", 'null': 'True', 'blank': 'True'}),
-            'packaged': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+            'packaged': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'page': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'coins.coinissue': {
             'Meta': {'object_name': 'CoinIssue', 'db_table': "'coins_coin_issues'"},

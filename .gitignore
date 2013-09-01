@@ -3,5 +3,5 @@ atlassian-ide-plugin.xml
 *.pyc
 *.mo
 *.db
-coinscollection/static/*
+content/*
 env

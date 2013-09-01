@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib import admin
+from django.views.generic.base import RedirectView
 
 admin.autodiscover()
 
@@ -10,5 +11,6 @@ urlpatterns = patterns('',
     (r'^cp/', include(admin.site.urls)),
 
     url(r'^coins/', include('coins.urls')),
+    url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico'))
 
 ) + staticfiles_urlpatterns()

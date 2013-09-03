@@ -2,6 +2,7 @@
 atlassian-ide-plugin.xml
 *.pyc
 *.mo
-content
-db
+public
+logs
+database
 env

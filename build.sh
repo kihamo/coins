@@ -80,7 +80,7 @@ function deploy()
 
     echo $0: Update source from git finished.
 
-    django_update
+    django_refresh
 }
 
 ARG=${1:-"-h"}

@@ -76,7 +76,7 @@ function deploy()
     echo $0: Update source from git.
 
     $GIT fetch origin master:refs/remotes/origin/master
-    # $GIT reset --hard origin/master
+    $GIT reset --hard origin/master
 
     echo $0: Update source from git finished.
 

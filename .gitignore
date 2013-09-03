@@ -4,5 +4,5 @@ atlassian-ide-plugin.xml
 *.mo
 public
 logs
-database
+db
 env

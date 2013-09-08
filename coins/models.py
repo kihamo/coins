@@ -2,6 +2,7 @@
 # http://www.falshivok.net/numismatics/Benin/35 coins params
 
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
 from coins.utils.fields import CoinImageField
@@ -145,6 +146,12 @@ class Collection(CoinAbstract):
         _('Name'),
         max_length=100,
         help_text=_('Collection name')
+    )
+    user = models.ForeignKey(
+        User,
+        verbose_name=_('User'),
+        blank=True,
+        null=True
     )
 
     class Meta(CoinAbstract.Meta):

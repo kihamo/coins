@@ -3,7 +3,7 @@ import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-from django.core.management import call_command
+
 
 class Migration(SchemaMigration):
 
@@ -137,7 +137,7 @@ class Migration(SchemaMigration):
         # Adding model 'Coin'
         db.create_table('coins_coins', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('collection', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['coins.Collection'])),
+            ('collection', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['coins.Collection'])),
             ('grade', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True, blank=True)),
             ('image_obverse', self.gf('coins.utils.fields.CoinImageField')(max_length=100, null=True, blank=True)),
             ('image_reverse', self.gf('coins.utils.fields.CoinImageField')(max_length=100, null=True, blank=True)),
@@ -158,7 +158,7 @@ class Migration(SchemaMigration):
         # Adding model 'Banknote'
         db.create_table('coins_banknotes', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('collection', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['coins.Collection'])),
+            ('collection', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['coins.Collection'])),
             ('grade', self.gf('django.db.models.fields.PositiveSmallIntegerField')(null=True, blank=True)),
             ('image_obverse', self.gf('coins.utils.fields.CoinImageField')(max_length=100, null=True, blank=True)),
             ('image_reverse', self.gf('coins.utils.fields.CoinImageField')(max_length=100, null=True, blank=True)),
@@ -175,7 +175,6 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'Banknote', fields ['album', 'page', 'division']
         db.create_unique('coins_banknotes', ['album', 'page', 'division'])
 
-        call_command('loaddata', 'country_currency.json')
 
     def backwards(self, orm):
         # Removing unique constraint on 'Banknote', fields ['album', 'page', 'division']
@@ -229,7 +228,7 @@ class Migration(SchemaMigration):
             'Meta': {'unique_together': "(('album', 'page', 'division'),)", 'object_name': 'Banknote', 'db_table': "'coins_banknotes'"},
             'album': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'booked': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'collection': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['coins.Collection']"}),
+            'collection': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['coins.Collection']"}),
             'division': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'features': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'grade': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -265,7 +264,7 @@ class Migration(SchemaMigration):
             'Meta': {'unique_together': "(('album', 'page', 'division'),)", 'object_name': 'Coin', 'db_table': "'coins_coins'"},
             'album': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'booked': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'collection': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['coins.Collection']"}),
+            'collection': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['coins.Collection']"}),
             'division': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'features': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'grade': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: coins\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-06-09 15:27+0400\n"
+"POT-Creation-Date: 2013-09-08 15:59+0400\n"
 "PO-Revision-Date: 2012-12-26 01:53+0400\n"
 "Last-Translator: Kihamo <infokihamo.ru>\n"
 "Language-Team: Russian <infokihamo.ru>\n"
@@ -20,10 +20,22 @@ msgid "Coins"
 msgstr "Монеты"
 
 #: __init__.py:4
+msgid "Constance"
+msgstr "Настройки"
+
+#: __init__.py:5
+msgid "Config"
+msgstr "Конфигурация"
+
+#: __init__.py:6
+msgid "Constance config"
+msgstr "Конфигурация настроек"
+
+#: __init__.py:7
 msgid "Default issue country"
 msgstr "Страна выпуска по-умолчанию"
 
-#: __init__.py:5
+#: __init__.py:8
 msgid "Default issue currency"
 msgstr "Валюта выпуска по-умолчанию"
 
@@ -39,35 +51,43 @@ msgstr "Печать боксов для всех монет"
 msgid "Barcode"
 msgstr "Штрихкод"
 
-#: admin.py:122 models.py:93 models.py:118 models.py:172 models.py:246
+#: admin.py:116 models.py:157
+msgid "Coins count"
+msgstr "Количество монет"
+
+#: admin.py:122 models.py:161
+msgid "Banknotes count"
+msgstr "Количество банкнот"
+
+#: admin.py:134 models.py:93 models.py:118 models.py:172 models.py:246
 msgid "Country"
 msgstr "Страна"
 
-#: admin.py:174 admin.py:308 models.py:240
+#: admin.py:186 admin.py:320 models.py:240
 msgid "Nominal"
 msgstr "Номинал"
 
-#: admin.py:183 admin.py:298
+#: admin.py:195 admin.py:310
 msgid "Image"
 msgstr "Изображение"
 
-#: admin.py:192 models.py:267
+#: admin.py:204 models.py:267
 msgid "Catalog number"
 msgstr "Каталожный номер"
 
-#: admin.py:219 admin.py:255
+#: admin.py:231 admin.py:267
 msgid "Main information"
 msgstr "Основная информация"
 
-#: admin.py:230 admin.py:266
+#: admin.py:242 admin.py:278
 msgid "Physical parameters"
 msgstr "Физические параметры"
 
-#: admin.py:237 admin.py:272 models.py:280
+#: admin.py:249 admin.py:284 models.py:280
 msgid "Description"
 msgstr "Описание"
 
-#: admin.py:312 models.py:253
+#: admin.py:324 models.py:253
 msgid "Year"
 msgstr "Год"
 
@@ -186,14 +206,6 @@ msgstr "коллекция"
 #: models.py:153
 msgid "collections"
 msgstr "коллекции"
-
-#: models.py:157
-msgid "Coins count"
-msgstr "Количество монет"
-
-#: models.py:161
-msgid "Banknotes count"
-msgstr "Количество банкнот"
 
 #: models.py:167
 msgid "Mint name"

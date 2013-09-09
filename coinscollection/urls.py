@@ -8,9 +8,8 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^cp/doc/', include('django.contrib.admindocs.urls')),
     url(r'^cp_tools/', include('admin_tools.urls')),
-    (r'^cp/', include(admin.site.urls)),
-
-    url(r'^coins/', include('coins.urls')),
-    url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico'))
+    url(r'^cp/', include(admin.site.urls)),
+    url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico')),
+    url(r'^', include('coins.urls'))
 
 ) + staticfiles_urlpatterns()

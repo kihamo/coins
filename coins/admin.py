@@ -10,7 +10,6 @@ from django.contrib import admin
 from django.forms import ModelForm
 
 from utils.widgets import AdminImageFileWidget
-from views import barcode as barcode_view
 from models import *
 
 from constance import config
@@ -57,7 +56,7 @@ class CopyInline(admin.StackedInline):
         if not model.id or not model.issue:
             return ''
 
-        url = reverse(barcode_view, args=[model.__class__.__name__.lower(), model.id, type])
+        url = reverse('barcode', args=[model.__class__.__name__.lower(), model.id, type])
         return '<img src="%s" alt="%s"/>' % (url, ugettext('Barcode'))
 
     def barcode(self, model):
@@ -202,22 +201,6 @@ class CopyIssueAdminAbstract(CoinAbstractModelAdmin):
         return model.catalog_number
     show_catalog_number.allow_tags = True
     show_catalog_number.short_description = _('Catalog number')
-
-    def get_urls(self):
-        """
-        Добавляем URL на свой View в даминке, который в свою очередь подключается
-        из фронта coins.views.barcode_view. Таким образом прозрачно заставляем
-        работать одну вьюху и на фронт и на админку
-
-        http://127.0.0.1:8000/admin/coins/coin/barcode/1.qr.png
-        """
-
-        return super(CopyIssueAdminAbstract, self).get_urls() + patterns('',
-            url(
-                r'^barcode\/(\d+)[.](?:(qr|code128))[.]png$',
-                barcode_view
-            ),
-        )
 
 class CoinIssueAdminForm(CopyIssueAdminForm):
     class Meta:

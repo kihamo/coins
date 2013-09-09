@@ -1,5 +1,4 @@
-# from django.core.files.storage import Storage
-
+from django.core.urlresolvers import reverse
 from django.core.files.images import ImageFile
 from database_storage import DatabaseStorage as DS
 
@@ -14,7 +13,7 @@ class DatabaseStorage(DS):
     def __init__(self):
         options = {
             'table': Image._meta.db_table,
-            'base_url': '/coins/image/'
+            'base_url': ''
         }
 
         super(DatabaseStorage, self).__init__(options)
@@ -50,3 +49,6 @@ class DatabaseStorage(DS):
             object.save()
 
         return object.pk
+
+    def url(self, name):
+        return reverse('show-image', args=[name])

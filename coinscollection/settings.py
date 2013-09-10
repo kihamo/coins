@@ -160,6 +160,7 @@ INSTALLED_APPS = (
     'constance',
     'constance.backends.database',
 
+    'rest_framework',
     'coins',
 )
 
@@ -215,4 +216,11 @@ ALLOWED_HOSTS = ['*']
 
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.UnicodeJSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
 }

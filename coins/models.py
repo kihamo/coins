@@ -193,7 +193,8 @@ class MintMark(CoinAbstract):
     )
     mint = models.ForeignKey(
         Mint,
-        verbose_name=_('Mint')
+        verbose_name=_('Mint'),
+        related_name='marks'
     )
 
     class Meta(CoinAbstract.Meta):

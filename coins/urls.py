@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, url
+from views import MintList
 
 urlpatterns = patterns('coins.views',
     url(
@@ -15,4 +16,5 @@ urlpatterns = patterns('coins.views',
         r'^box\/(\d+)(?:[.](html|pdf))?$',
         'box'
     ),
+    url(r'^mints/$', MintList.as_view()),
 )

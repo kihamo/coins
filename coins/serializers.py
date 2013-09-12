@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import Mint, Currency, CurrencyHistory, Country
+from models import Mint, Currency, CurrencyHistory, Country, Collection
 
 class MintSerializer(serializers.ModelSerializer):
     country = serializers.Field(source='country.name')
@@ -50,3 +50,21 @@ class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
         fields = ('id', 'name', 'iso', 'url', 'currencies', 'current')
+
+class CollectionSerializer(serializers.ModelSerializer):
+    owner = serializers.SerializerMethodField('get_owner_name')
+    url = serializers.HyperlinkedIdentityField(view_name='collection-detail')
+
+    class Meta:
+        model = Collection
+        fields = ('id', 'name', 'owner', 'url')
+
+    def get_owner_name(self, obj):
+        name = None
+
+        if obj.owner:
+            name = obj.owner.get_full_name().strip()
+            if not name:
+                name = obj.owner.username
+
+        return name

@@ -1,11 +1,12 @@
 from django.conf.urls import patterns, url, include
-from viewsets import MintViewSet, CountryViewSet, CurrencyViewSet
 from rest_framework.routers import DefaultRouter
+import viewsets
 
 router = DefaultRouter()
-router.register(r'mints', MintViewSet)
-router.register(r'countries', CountryViewSet)
-router.register(r'currencies', CurrencyViewSet)
+router.register(r'mints', viewsets.MintViewSet)
+router.register(r'countries', viewsets.CountryViewSet)
+router.register(r'currencies', viewsets.CurrencyViewSet)
+router.register(r'collections', viewsets.CollectionViewSet)
 
 urlpatterns = patterns('coins.views',
     url(

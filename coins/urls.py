@@ -1,5 +1,10 @@
-from django.conf.urls import patterns, url
-from views import MintList
+from django.conf.urls import patterns, url, include
+from viewsets import MintViewSet, CountryViewSet
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'mints', MintViewSet)
+router.register(r'countries', CountryViewSet)
 
 urlpatterns = patterns('coins.views',
     url(
@@ -16,5 +21,5 @@ urlpatterns = patterns('coins.views',
         r'^box\/(\d+)(?:[.](html|pdf))?$',
         'box'
     ),
-    url(r'^mints/$', MintList.as_view()),
+    url(r'^', include(router.urls))
 )

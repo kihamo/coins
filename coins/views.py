@@ -1,10 +1,7 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, Http404
 
-from rest_framework import generics
-from serializers import MintSerializer
-
-from models import Coin, Mint
+from models import Coin
 from django.db.models.loading import get_model
 
 from PIL import Image
@@ -94,7 +91,3 @@ def box(request, coin_id, view_format = 'html'):
     box.draw(response)
 
     return response
-
-class MintList(generics.ListAPIView):
-    queryset = Mint.objects.select_related('country').prefetch_related('marks')
-    serializer_class = MintSerializer

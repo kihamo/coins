@@ -86,7 +86,7 @@ class Command(BaseCommand):
     }
 
     _re_params = re.compile(r'^[\s]*([^:]+?)[\s]*:[\s]*(.+?)[\s.]*$', re.UNICODE)
-    _re_mint = re.compile(r'[\W]*([^(]+?)\s*\((.+?)\)(?:\s*[^\d\s.]*\s*([\d\s]+?)\s*([\w]+)[.])?', re.UNICODE)
+    _re_mint = re.compile(r'[\W]*([^(]+?)\s*\(([^)]+?)(?:\)|$)(?:\s*[^\d\s.]*\s*([\d\s]+?)\s*([\w]+)[.])?', re.UNICODE)
 
     def __init__(self):
         super(Command, self).__init__()

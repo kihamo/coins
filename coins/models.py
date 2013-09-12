@@ -147,7 +147,7 @@ class Collection(CoinAbstract):
         max_length=100,
         help_text=_('Collection name')
     )
-    user = models.ForeignKey(
+    owner = models.ForeignKey(
         User,
         verbose_name=_('User'),
         blank=True,

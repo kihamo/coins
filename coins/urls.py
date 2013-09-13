@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, url, include
+from django.views.generic import TemplateView
 from rest_framework.routers import DefaultRouter
 import viewsets
 
@@ -23,5 +24,6 @@ urlpatterns = patterns('coins.views',
         r'^box\/(\d+)(?:[.](html|pdf))?$',
         'box'
     ),
+    url(r'^$', TemplateView.as_view(template_name='index.html')),
     url(r'^', include(router.urls))
 )

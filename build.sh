@@ -1,8 +1,9 @@
 #!/bin/bash
 
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
+ENV_DIR=$BASE_DIR/env
 
-MANAGER="python ${BASE_DIR}/manage.py"
+MANAGER="${ENV_DIR}/bin/python ${BASE_DIR}/manage.py"
 GIT="git"
 VIRTUALENV="virtualenv"
 
@@ -10,20 +11,18 @@ function create_env()
 {
     echo $0: Creating virtual environment.
 
-    ENV_DIR=$BASE_DIR/env
-
     if [ ! -d "$ENV_DIR" ]
     then
         rm -rf $ENV_DIR
-        $VIRTUALENV --prompt="coinscollection" $BASE_DIR/env
+        $VIRTUALENV --prompt="coinscollection" $ENV_DIR
     fi
 
-    source $BASE_DIR/env/bin/activate
+    source $ENV_DIR/bin/activate
     export PIP_REQUIRE_VIRTUALENV=true
-    $BASE_DIR/env/bin/pip install --upgrade --requirement=./requirements.txt --log=$BASE_DIR/logs/build_pip_packages.log
+    $ENV_DIR/bin/pip install --upgrade --requirement=./requirements.txt --log=$BASE_DIR/logs/build_pip_packages.log
 
     echo $0: Making virtual environment relocatable
-    $VIRTUALENV --relocatable $BASE_DIR/env
+    $VIRTUALENV --relocatable $ENV_DIR
 
     echo $0: Creating virtual environment finished.
 }
@@ -44,8 +43,6 @@ function create_database()
 
 function django_refresh()
 {
-    source $BASE_DIR/env/bin/activate
-
     $MANAGER collectstatic --noinput
 
     cd $BASE_DIR/coins
@@ -62,8 +59,6 @@ function first_run()
 
     create_env
     create_database
-
-    source $BASE_DIR/env/bin/activate
 
     $MANAGER createsuperuser
     $MANAGER countries

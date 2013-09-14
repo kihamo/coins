@@ -6,3 +6,4 @@ public
 logs
 db
 env
+gunicorn.pid

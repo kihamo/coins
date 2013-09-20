@@ -1,13 +1,5 @@
 from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView
-from rest_framework.routers import DefaultRouter
-import viewsets
-
-router = DefaultRouter()
-router.register(r'mints', viewsets.MintViewSet)
-router.register(r'countries', viewsets.CountryViewSet)
-router.register(r'currencies', viewsets.CurrencyViewSet)
-router.register(r'collections', viewsets.CollectionViewSet)
 
 urlpatterns = patterns('coins.views',
     url(
@@ -25,5 +17,5 @@ urlpatterns = patterns('coins.views',
         'box'
     ),
     url(r'^$', TemplateView.as_view(template_name='index.html')),
-    url(r'^', include(router.urls))
+    url(r'^', include('coins.api.urls'))
 )

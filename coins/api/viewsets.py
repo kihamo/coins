@@ -1,6 +1,6 @@
 from rest_framework import viewsets, mixins
 import serializers
-from models import Mint, Country, Currency, Collection
+from coins.models import Mint, Country, Currency, Collection
 
 class MintViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Mint.objects.select_related('country').prefetch_related('marks')

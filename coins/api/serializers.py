@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import Mint, Currency, CurrencyHistory, Country, Collection
+from coins.models import Mint, Currency, CurrencyHistory, Country, Collection
 
 class MintSerializer(serializers.ModelSerializer):
     country = serializers.Field(source='country.name')

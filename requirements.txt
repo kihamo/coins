@@ -1,5 +1,5 @@
 # Django apps
-Django>=1.5.2
+Django>=1.5.4
 django-database-storage>=0.1.2
 django-constance>=0.6
 django-picklefield>=0.3.0

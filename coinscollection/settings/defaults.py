@@ -1,11 +1,10 @@
 import os
 from django.utils.translation import ugettext_lazy as _
 
-PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+PROJECT_PATH = os.path.realpath(os.path.join(__file__, '..', '..'))
 ROOT_PATH = os.path.abspath(os.path.dirname(PROJECT_PATH))
 
-DEBUG = False
-TEMPLATE_DEBUG = DEBUG
+TEMPLATE_DEBUG = False
 
 SERVER_EMAIL = 'coins@kihamo.ru'
 DEFAULT_FROM_EMAIL = SERVER_EMAIL
@@ -105,8 +104,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'coinscollection.urls'
@@ -125,8 +122,6 @@ TEMPLATE_DIRS = (
 TEMPLATE_CONTEXT_PROCESSORS = (
     # default template context processors
     'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
     'django.core.context_processors.media',
     'django.core.context_processors.static',
     'django.core.context_processors.tz',
@@ -145,8 +140,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'debug_toolbar',
 
     'admin_tools',
     'admin_tools.theming',
@@ -224,3 +217,6 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
 }
+
+if USE_I18N:
+    TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.i18n',)

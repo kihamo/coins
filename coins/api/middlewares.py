@@ -1,4 +1,4 @@
-from django import http
+from django import http, views
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import exceptions
@@ -23,6 +23,9 @@ class ErrorsMiddleware(object):
                 else:
                     return response
 
-            response = error(request, response).render()
+            response = error(request, response)
+
+            if hasattr(response, 'render'):
+                response.render()
 
         return response

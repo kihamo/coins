@@ -18,20 +18,13 @@ from datetime import datetime
 from django.core.files.images import ImageFile
 from django.core.files.temp import NamedTemporaryFile
 
+
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
-        make_option('-y', '--year',
-            type='string',
-            help='Year parse'),
-        make_option('-n', '--number',
-            type='str',
-            help='Coin catalog number'),
-        make_option('-d', '--debug',
-            action='store_true',
-            help='Debug mode'),
-        make_option('-t', '--test',
-            action='store_true',
-            help='Test mode'),
+        make_option('-y', '--year', type='string', help='Year parse'),
+        make_option('-n', '--number', type='str', help='Coin catalog number'),
+        make_option('-d', '--debug', action='store_true', help='Debug mode'),
+        make_option('-t', '--test', action='store_true', help='Test mode'),
     )
 
     help = 'Scan cbr.ru site'
@@ -41,7 +34,9 @@ class Command(BaseCommand):
     base_url = '%s/bank-notes_coins/' % site_url
 
     year_url_template = '%sDefault.aspx?Prtid=coins_base' % base_url
-    coin_url_template = '%sBase_of_memorable_coins/ShowCoins.aspx?cat_num=%%s' % base_url
+    coin_url_template = '%sBase_of_memorable_coins/' \
+                        'ShowCoins.aspx?cat_num=%%s' \
+                        % base_url
 
     nominals = {
         '00': .005, '09': 1,   '18': 150,
@@ -56,37 +51,48 @@ class Command(BaseCommand):
     }
 
     _main_information_mapping = {
-        u'каталожный номер'     : 'catalog_number',
-        u'дата выпуска'         : 'date_issue'
+        u'каталожный номер': 'catalog_number',
+        u'дата выпуска': 'date_issue'
     }
     _main_params_mapping = {
-        u'сплав'          : 'alloy',
-        u'металл, проба'  : 'alloy',
-        u'материал'       : 'alloy',
-        u'тираж, шт.'     : 'mintage',
-        u'диаметр, мм'    : 'diameter',
-        u'толщина, мм'    : 'thickness',
-        u'масса общая, г' : 'weight',
+        u'сплав': 'alloy',
+        u'металл, проба': 'alloy',
+        u'материал': 'alloy',
+        u'тираж, шт.': 'mintage',
+        u'диаметр, мм': 'diameter',
+        u'толщина, мм': 'thickness',
+        u'масса общая, г': 'weight',
     }
     _other_params_mapping = {
-        u'оформление гурта' : 'desc_edge',
-        u'чеканка'          : 'mint'
+        u'оформление гурта': 'desc_edge',
+        u'чеканка': 'mint'
     }
     _mint_names_mapping = {
-        u'санкт-петергбургский монетный двор' : u'санкт-петербургский монетный двор',
-        u'санкт-петергбурский монетный двор'  : u'санкт-петербургский монетный двор',
-        u'санкт-петербугрский монетный двор'  : u'санкт-петербургский монетный двор',
-        u'санкт петербургский'                : u'санкт-петербургский монетный двор',
+        u'санкт-петергбургский монетный двор':
+        u'санкт-петербургский монетный двор',
+        u'санкт-петергбурский монетный двор':
+        u'санкт-петербургский монетный двор',
+        u'санкт-петербугрский монетный двор':
+        u'санкт-петербургский монетный двор',
+        u'санкт петербургский':
+        u'санкт-петербургский монетный двор',
 
-        u'ленинградский монетный двор'        : u'ленинградский монетный двор',
-        u'лениградский монетный двор'         : u'ленинградский монетный двор',
+        u'ленинградский монетный двор':
+        u'ленинградский монетный двор',
+        u'лениградский монетный двор':
+        u'ленинградский монетный двор',
 
-        u'московкий монетный двор'            : u'московский монетный двор',
-        u'московский монетный'                : u'московский монетный двор',
+        u'московкий монетный двор':
+        u'московский монетный двор',
+        u'московский монетный':
+        u'московский монетный двор',
     }
 
-    _re_params = re.compile(r'^[\s]*([^:]+?)[\s]*:[\s]*(.+?)[\s.]*$', re.UNICODE)
-    _re_mint = re.compile(r'[\W]*([^(]+?)\s*\(([^)]+?)(?:\)|$)(?:\s*[^\d\s.]*\s*([\d\s]+?)\s*([\w]+)[.])?', re.UNICODE)
+    _re_params = re.compile(r'^[\s]*([^:]+?)[\s]*:[\s]*(.+?)[\s.]*$',
+                            re.UNICODE)
+    _re_mint = re.compile(r'[\W]*([^(]+?)\s*\(([^)]+?)(?:\)|$)'
+                          r'(?:\s*[^\d\s.]*\s*([\d\s]+?)\s*([\w]+)[.])?',
+                          re.UNICODE)
 
     def __init__(self):
         super(Command, self).__init__()
@@ -94,7 +100,9 @@ class Command(BaseCommand):
         self.urllib_handler = urllib2.HTTPHandler(debuglevel=0)
         opener = urllib2.build_opener(self.urllib_handler)
         opener.addheaders = [
-            ('User-agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1490.2 Safari/537.36')
+            ('User-agent', 'Mozilla/5.0 (X11; Linux x86_64) '
+                           'AppleWebKit/537.36 (KHTML, like Gecko) '
+                           'Chrome/28.0.1490.2 Safari/537.36')
         ]
         urllib2.install_opener(opener)
 
@@ -124,14 +132,15 @@ class Command(BaseCommand):
         except:
             raise CommandError('Error load image %s' % image_url)
 
-        image_tmp = NamedTemporaryFile(delete = True)
+        image_tmp = NamedTemporaryFile(delete=True)
         image_tmp.write(content.read())
         image_tmp.flush()
         image_tmp.seek(0)
 
         return ImageFile(image_tmp)
 
-    def handle(self, year = None, number = None, test = None, debug = None, *args, **options):
+    def handle(self, year=None, number=None, test=None,
+               debug=None, *args, **options):
         self.test = test
 
         if debug:
@@ -145,7 +154,10 @@ class Command(BaseCommand):
     def _parse_year(self, years):
         doc = self._load_url(self.year_url_template)
 
-        years_exists = doc.xpath('.//select[@id="ctl00_ContentPlaceHolder1_UC_Plug_12434_YearSelect"]/option')
+        years_exists = doc.xpath('.//select[@id="'
+                                 'ctl00_ContentPlaceHolder1_'
+                                 'UC_Plug_12434_YearSelect'
+                                 '"]/option')
         if not years_exists:
             raise CommandError('Years list not found')
 
@@ -170,7 +182,11 @@ class Command(BaseCommand):
             params['ctl00$ContentPlaceHolder1$UC_Plug_12434$YearSelect'] = year
 
             doc = self._load_url(self.year_url_template, params)
-            coins = doc.xpath('.//span[@id="ctl00_ContentPlaceHolder1_UC_Plug_12434_ResultData"]/table/tr[not(@align="center")][count(td)=4]/td[2]/text()')
+            coins = doc.xpath('.//span[@id="'
+                              'ctl00_ContentPlaceHolder1_'
+                              'UC_Plug_12434_ResultData"]'
+                              '/table/tr[not(@align="center")][count(td)=4]'
+                              '/td[2]/text()')
 
             self._parse_coin(coins)
 
@@ -178,15 +194,17 @@ class Command(BaseCommand):
         if not catalog_numbers:
             self.stderr.write('Coins not found')
 
-        self._country = Country.objects.get(iso = 'RUS')
-        self._mints = list(Mint.objects.filter(country = self._country))
+        self._country = Country.objects.get(iso='RUS')
+        self._mints = list(Mint.objects.filter(country=self._country))
 
         catalog_numbers = map(str, catalog_numbers)
         for catalog_number in catalog_numbers:
             nominal_index = catalog_number[2:4]
 
-            if not self.nominals.has_key(nominal_index) or not self.nominals[nominal_index]:
-                self.stderr.write('Nominal index error (catalog_number: %s)' % catalog_number)
+            if (not nominal_index in self.nominals or
+               not self.nominals[nominal_index]):
+                self.stderr.write('Nominal index error (catalog_number: %s)'
+                                  % catalog_number)
                 return
 
             self.stdout.write('Parse coin %s' % catalog_number)
@@ -198,7 +216,8 @@ class Command(BaseCommand):
             }
 
             # main information
-            main_information = doc.xpath('.//div[@class="BnkHeader_block"]/descendant-or-self::*')
+            main_information = doc.xpath('.//div[@class="BnkHeader_block"]'
+                                         '/descendant-or-self::*')
             if not main_information:
                 self.stderr.write('Main information not found')
             else:
@@ -214,9 +233,11 @@ class Command(BaseCommand):
                     match = self._re_params.match(string)
                     if not match:
                         if 'name' in info:
-                            self.stderr.write('Error parse main information string "%s"' % string)
+                            self.stderr.write('Error parse main '
+                                              'information string "%s"'
+                                              % string)
                         elif node.tag == 'b':
-                             info['series'] = string
+                            info['series'] = string
                         else:
                             info['name'] = string
 
@@ -227,7 +248,9 @@ class Command(BaseCommand):
 
                     key = match.group(1).lower().replace('c', u'с')
                     if not key in self._main_information_mapping:
-                        self.stderr.write('Not found key for main information "%s"' % key)
+                        self.stderr.write('Not found key for '
+                                          'main information "%s"'
+                                          % key)
                         continue
 
                     info[self._main_information_mapping[key]] = match.group(2)
@@ -238,8 +261,13 @@ class Command(BaseCommand):
                 self.stderr.write('Main params not found')
             else:
                 columns = []
-                for node in main_params[0].xpath('tr[@class="monet_header_cl"]/td'):
-                    key = ' '.join([x.strip(' *').strip().lower().replace('c', u'с') for x in node.xpath('text()')])
+                for node in main_params[0].xpath(
+                        'tr[@class="monet_header_cl"]/td'
+                ):
+                    key = ' '.join([
+                        x.strip(' *').strip().lower().replace('c', u'с')
+                        for x in node.xpath('text()')
+                    ])
 
                     if key in self._main_params_mapping:
                         key = self._main_params_mapping[key]
@@ -250,32 +278,44 @@ class Command(BaseCommand):
                 for tr in main_params[0].xpath('tr[position()>1]'):
                     i = 0
                     for td in tr.xpath('td'):
-                        info[columns[i]].append(''.join(td.xpath('text()')).strip())
+                        info[columns[i]].append(
+                            ''.join(td.xpath('text()')).strip())
                         i += 1
 
             # obverse and reverse
-            desc_obverse = doc.xpath('//*[@id="form1"]/table[2]/tr[1]/td[4]/descendant-or-self::*/text()[normalize-space(.)]')
+            desc_obverse = doc.xpath('//*[@id="form1"]/table[2]/tr[1]/td[4]'
+                                     '/descendant-or-self::*'
+                                     '/text()[normalize-space(.)]')
             if not desc_obverse:
                 self.stderr.write('Obverse description not found')
             else:
-                info['desc_obverse'] = '\n'.join([x.strip() for x in desc_obverse])
+                info['desc_obverse'] = '\n'.join(
+                    [x.strip() for x in desc_obverse]
+                )
 
-            desc_reverse = doc.xpath('//*[@id="form1"]/table[2]/tr[2]/td[3]/descendant-or-self::*/text()[normalize-space(.)]')
+            desc_reverse = doc.xpath('//*[@id="form1"]/table[2]/tr[2]/td[3]'
+                                     '/descendant-or-self::*'
+                                     '/text()[normalize-space(.)]')
             if not desc_reverse:
                 self.stderr.write('Reverse description not found')
             else:
-                info['desc_reverse'] = '\n'.join([x.strip() for x in desc_reverse])
+                info['desc_reverse'] = '\n'.join(
+                    [x.strip() for x in desc_reverse]
+                )
 
             # images
             images = doc.xpath('//*[@id="form1"]/table[2]/.//img/@src')
             if not len(images) == 2:
-                self.stderr.write('Error count images. Found %d images' % len(images))
+                self.stderr.write('Error count images. Found %d images'
+                                  % len(images))
             else:
                 info['image_obverse'] = images[0]
                 info['image_reverse'] = images[1]
 
             # others params
-            others = doc.xpath('//*[@id="form1"]/table[2]/tr[3]/td[@valign="top"]/descendant-or-self::*/text()[normalize-space(.)]')
+            others = doc.xpath('//*[@id="form1"]/table[2]/tr[3]'
+                               '/td[@valign="top"]/descendant-or-self::*'
+                               '/text()[normalize-space(.)]')
             if not others:
                 self.stderr.write('Others rapams not found')
             else:
@@ -288,7 +328,8 @@ class Command(BaseCommand):
                         if key:
                             info[key] += '\n%s' % string.strip().strip('.')
                         else:
-                            self.stderr.write('Error parse other param "%s"' % string)
+                            self.stderr.write('Error parse other param "%s"'
+                                              % string)
                     else:
                         key = match.group(1).lower().replace('c', u'с')
 
@@ -299,7 +340,9 @@ class Command(BaseCommand):
 
             # mints
             if 'mintage' in info:
-                info['mintage'] = sum([int(re.sub('[^\d]', '', i)) for i in info['mintage']])
+                info['mintage'] = sum([
+                    int(re.sub('[^\d]', '', i)) for i in info['mintage']
+                ])
 
             if not 'mint' in info:
                 self.stderr.write('Mint information not found')
@@ -320,12 +363,13 @@ class Command(BaseCommand):
                         continue
 
                     mint = {
-                        'name'   : ' '.join(match.group(1).replace('c', u'с').split()),
-                        'mark'   : match.group(2),
+                        'name': ' '.join(
+                            match.group(1).replace('c', u'с').split()),
+                        'mark': match.group(2),
                         'mintage': match.group(3)
                     }
 
-                    if self._mint_names_mapping.has_key(mint['name']):
+                    if mint['name'] in self._mint_names_mapping:
                         mint['name'] = self._mint_names_mapping[mint['name']]
 
                     mint['name'] = mint['name'].title()
@@ -339,7 +383,8 @@ class Command(BaseCommand):
                             if match.group(4) == u'млн':
                                 mint['mintage'] *= 1000000
                             else:
-                                self.stderr.write('Unknown unit "%s"' % match.group(4))
+                                self.stderr.write('Unknown unit "%s"'
+                                                  % match.group(4))
 
                         total_mintage += mint['mintage']
 
@@ -347,8 +392,11 @@ class Command(BaseCommand):
 
                 if 'mintage' in info:
                     if total_mintage > 0 and total_mintage != info['mintage']:
-                        self.stderr.write('Total mintage %s is not the same as the total mintage %s' % (info['mintage'], total_mintage))
-                    elif len(info['mint']) == 1 and not info['mint'][0]['mintage']:
+                        self.stderr.write('Total mintage %s is not '
+                                          'the same as the total mintage %s'
+                                          % (info['mintage'], total_mintage))
+                    elif (len(info['mint']) == 1 and
+                          not info['mint'][0]['mintage']):
                         info['mint'][0]['mintage'] = info['mintage']
 
             # descriptions
@@ -361,12 +409,14 @@ class Command(BaseCommand):
             # remove double whitespace
             for key in info:
                 if isinstance(info[key], type(u'')):
-                    info[key] = re.sub('[ \t\r\f\v]+', ' ', info[key].strip('"\''))
+                    info[key] = re.sub('[ \t\r\f\v]+', ' ',
+                                       info[key].strip('"\''))
                     info[key] = re.sub('\n+', '\n', info[key])
 
             # type juggling
             if 'date_issue' in info:
-                info['date_issue'] = datetime.strptime(info['date_issue'], '%d.%m.%Y')
+                info['date_issue'] = datetime.strptime(info['date_issue'],
+                                                       '%d.%m.%Y')
                 info['year'] = info['date_issue'].year
             else:
                 self.stderr.write('Date issue not found')
@@ -374,7 +424,8 @@ class Command(BaseCommand):
 
             # coin type
             info['type'] = CoinIssue.TYPES_CHOICES[0][0]
-            if int(info['catalog_number'][0]) in [3, 5] and int(info['catalog_number'][1]) in [1, 2, 3, 4, 6]:
+            if (int(info['catalog_number'][0]) in [3, 5] and
+               int(info['catalog_number'][1]) in [1, 2, 3, 4, 6]):
                 info['type'] = CoinIssue.TYPES_CHOICES[2][0]
 
             not self.test and self._save_coin(info)
@@ -384,14 +435,14 @@ class Command(BaseCommand):
 
         # save issue
         issue, created = CoinIssue.objects.get_or_create(
-            catalog_number = info['catalog_number'],
-            defaults = {
-                'name'         : info['name'],
-                'type'         : info['type'],
-                'nominal'      : info['nominal'],
-                'country'      : self._country,
-                'currency'     : self._country.current_currency,
-                'year'         : info['year']
+            catalog_number=info['catalog_number'],
+            defaults={
+                'name': info['name'],
+                'type': info['type'],
+                'nominal': info['nominal'],
+                'country': self._country,
+                'currency': self._country.current_currency,
+                'year': info['year']
             }
         )
 
@@ -409,15 +460,18 @@ class Command(BaseCommand):
                             self._load_image(new_value)
                         )
                     except:
-                        self.stderr.write('Error load %s file for coin id %d' % (field.name, issue.pk))
+                        self.stderr.write('Error load %s file for coin id %d'
+                                          % (field.name, issue.pk))
             else:
                 if field.name == 'series':
-                    new_value, created = Series.objects.get_or_create(name = new_value)
+                    new_value, created = Series.objects.get_or_create(
+                        name=new_value)
 
                     if created:
                         self.stdout.write('Add series "%s"' % new_value)
                 elif field.name in ['diameter', 'thickness', 'weight']:
-                    match = re.match('(^[0-9]+[0-9,.]*[0-9]*).*', new_value[0], re.UNICODE)
+                    match = re.match('(^[0-9]+[0-9,.]*[0-9]*).*', new_value[0],
+                                     re.UNICODE)
                     if not match:
                         continue
 
@@ -429,36 +483,45 @@ class Command(BaseCommand):
                 if current_value is None or current_value == '':
                     issue.__setattr__(field.name, new_value)
 
-        self.stdout.write('Save %s coin issue "%s"' % ('new' if created else 'exists', issue.name))
+        self.stdout.write('Save %s coin issue "%s"'
+                          % ('new' if created else 'exists', issue.name))
         issue.save()
 
         # save mints
         if 'mint' in info and not issue.mints.count():
             for mint_info in info['mint']:
-                # http://cbr.ru/bank-notes_coins/Base_of_memorable_coins/ShowCoins.aspx?cat_num=5109-0079
                 mint_info['name'] = mint_info['name'].split(':')[-1].strip()
 
-                mint, created = Mint.objects.get_or_create(name = mint_info['name'], country = self._country)
+                mint, created = Mint.objects.get_or_create(
+                    name=mint_info['name'],
+                    country=self._country)
                 if created:
                     self.stdout.write('Add mint "%s"' % mint)
 
                 if mint_info['mark']:
-                    mark, created = MintMark.objects.get_or_create(mark = mint_info['mark'], mint = mint)
+                    mark, created = MintMark.objects.get_or_create(
+                        mark=mint_info['mark'],
+                        mint=mint)
                     if created:
-                        self.stdout.write('Add mark "%s" for mint "%s"' % (mark, mint))
+                        self.stdout.write('Add mark "%s" for mint "%s"'
+                                          % (mark, mint))
                 else:
                     mark = None
 
                 issue_mint, created = IssueMint.objects.get_or_create(
-                    mint = mint, issue = issue,
-                    defaults = {
-                        'mintage'   : mint_info['mintage'],
-                        'mint_mark' : mark
+                    mint=mint, issue=issue,
+                    defaults={
+                        'mintage': mint_info['mintage'],
+                        'mint_mark': mark
                     }
                 )
                 if created:
-                    self.stdout.write('Add mint "%s" for issue "%s"' % (mint, issue))
+                    self.stdout.write('Add mint "%s" for issue "%s"'
+                                      % (mint, issue))
                 elif issue_mint.mintage != mint_info['mintage']:
                     issue_mint.mintage = mint_info['mintage']
                     issue_mint.save()
-                    self.stdout.write('Update mintage %d for mint "%s" in issue "%s"' % (issue_mint.mintage, mint, issue))
+                    self.stdout.write(
+                        'Update mintage %d for mint "%s" in issue "%s"'
+                        % (issue_mint.mintage, mint, issue)
+                    )

@@ -83,7 +83,6 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -93,7 +92,6 @@ SECRET_KEY = 'u6peshuutu$_96l%s&amp;yrge7ks@*6z_z_z&amp;wvkc0iynp#ff4#cy'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -114,10 +112,6 @@ ROOT_URLCONF = 'coinscollection.urls'
 WSGI_APPLICATION = 'coinscollection.wsgi.application'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-
     os.path.join(ROOT_PATH, 'coins', 'templates'),
 )
 

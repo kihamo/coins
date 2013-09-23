@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from coins.utils.fields import CoinImageField
 
+
 class CoinAbstract(models.Model):
     class Meta:
         abstract = True
@@ -17,12 +18,13 @@ class CoinAbstract(models.Model):
 
         return '%s object' % self.__class__.__name__
 
+
 class Image(CoinAbstract):
     hash = models.CharField(
-        editable = False,
-        max_length = 32,
-        primary_key = True,
-        unique = True
+        editable=False,
+        max_length=32,
+        primary_key=True,
+        unique=True
     )
     filename = models.CharField(
         max_length=256
@@ -39,6 +41,7 @@ class Image(CoinAbstract):
         editable=False,
         max_length=50
     )
+
 
 # country & currency
 class IsoAbstract(CoinAbstract):
@@ -60,6 +63,7 @@ class IsoAbstract(CoinAbstract):
         self.iso = self.iso.upper()
         super(IsoAbstract, self).save(**kwargs)
 
+
 class Country(IsoAbstract):
     current_currency = models.ForeignKey(
         'coins.Currency',
@@ -77,8 +81,11 @@ class Country(IsoAbstract):
 
     def __init__(self, *args, **kwargs):
         IsoAbstract.__init__(self, *args, **kwargs)
-        self._meta.get_field_by_name('iso')[0].help_text = _('Country ISO 3 code')
-        self._meta.get_field_by_name('name')[0].help_text = _('Country name')
+        self._meta.get_field_by_name('iso')[0].help_text = \
+            _('Country ISO 3 code')
+        self._meta.get_field_by_name('name')[0].help_text = \
+            _('Country name')
+
 
 class Currency(IsoAbstract):
     sign = models.CharField(
@@ -104,14 +111,17 @@ class Currency(IsoAbstract):
 
     def __init__(self, *args, **kwargs):
         IsoAbstract.__init__(self, *args, **kwargs)
-        self._meta.get_field_by_name('iso')[0].help_text = _('Currency ISO 3 code')
-        self._meta.get_field_by_name('name')[0].help_text = _('Currency name')
+        self._meta.get_field_by_name('iso')[0].help_text = \
+            _('Currency ISO 3 code')
+        self._meta.get_field_by_name('name')[0].help_text = \
+            _('Currency name')
 
     def __unicode__(self):
         if self.sign and len(self.sign):
             return u'%s (%s)' % (self.name, self.sign)
 
         return self.name
+
 
 class CurrencyHistory(CoinAbstract):
     country = models.ForeignKey(
@@ -141,6 +151,7 @@ class CurrencyHistory(CoinAbstract):
         verbose_name = _('currency')
         verbose_name_plural = _('currencies')
 
+
 class Collection(CoinAbstract):
     name = models.CharField(
         _('Name'),
@@ -167,6 +178,7 @@ class Collection(CoinAbstract):
         return self.banknote_set.count()
     banknotes_count.short_description = _('Banknotes count')
 
+
 # coin
 class Mint(CoinAbstract):
     name = models.CharField(
@@ -184,6 +196,7 @@ class Mint(CoinAbstract):
         verbose_name = _('mint')
         verbose_name_plural = _('mints')
         ordering = ['name']
+
 
 class MintMark(CoinAbstract):
     mark = models.CharField(
@@ -210,6 +223,7 @@ class MintMark(CoinAbstract):
     def __unicode__(self):
         return self.mark
 
+
 class Series(CoinAbstract):
     name = models.CharField(
         _('Name'),
@@ -222,6 +236,7 @@ class Series(CoinAbstract):
         verbose_name = _('series')
         verbose_name_plural = _('series')
         ordering = ['name']
+
 
 class CopyIssueAbstract(CoinAbstract):
     class Meta:
@@ -318,6 +333,7 @@ class CopyIssueAbstract(CoinAbstract):
         return self._model_set.filter(booked=True).count()
     copy_booked_count.short_description = _('Booked')
 
+
 class CoinIssue(CopyIssueAbstract):
     mints = models.ManyToManyField(
         Mint,
@@ -369,6 +385,7 @@ class CoinIssue(CopyIssueAbstract):
         super(CoinIssue, self).__init__(*args, **kwargs)
         self._model_set = self.coin_set
 
+
 class BanknoteIssue(CopyIssueAbstract):
     weight = models.DecimalField(
         _('Weight'),
@@ -395,6 +412,7 @@ class BanknoteIssue(CopyIssueAbstract):
     def __init__(self, *args, **kwargs):
         super(BanknoteIssue, self).__init__(*args, **kwargs)
         self._model_set = self.banknote_set
+
 
 class IssueMint(CoinAbstract):
     issue = models.ForeignKey(
@@ -429,6 +447,7 @@ class IssueMint(CoinAbstract):
 
         return self.mint
 
+
 class CopyAbstract(CoinAbstract):
     class Meta:
         abstract = True
@@ -436,7 +455,11 @@ class CopyAbstract(CoinAbstract):
     collection = models.ForeignKey(
         Collection,
         verbose_name=_('Collection'),
-        default=lambda: Collection.objects.count() and Collection.objects.all()[0] or None
+        default=lambda: [
+            Collection.objects.count()
+            and Collection.objects.all()[0]
+            or None
+        ]
     )
     grade = models.PositiveSmallIntegerField(
         _('Grade'),
@@ -531,6 +554,7 @@ class CopyAbstract(CoinAbstract):
 
         super(CopyAbstract, self).save(*args, **kwargs)
 
+
 class Coin(CopyAbstract):
     issue = models.ForeignKey(
         CoinIssue,
@@ -548,6 +572,7 @@ class Coin(CopyAbstract):
         unique_together = ('album', 'page', 'division')
         verbose_name = _('coin')
         verbose_name_plural = _('coins')
+
 
 class Banknote(CopyAbstract):
     issue = models.ForeignKey(

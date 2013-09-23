@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from coins.models import Mint, Currency, CurrencyHistory, Country, Collection
 
+
 class MintSerializer(serializers.ModelSerializer):
     country = serializers.Field(source='country.name')
     marks = serializers.RelatedField(many=True)
@@ -8,6 +9,7 @@ class MintSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mint
         fields = ('id', 'name', 'country', 'marks')
+
 
 class CurrencySerializer(serializers.ModelSerializer):
     class CountrySerializer(serializers.ModelSerializer):
@@ -23,6 +25,7 @@ class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
         fields = ('id', 'name', 'iso', 'sign', 'url', 'countries')
+
 
 class CountrySerializer(serializers.ModelSerializer):
     class CurrencySerializer(serializers.ModelSerializer):
@@ -41,15 +44,18 @@ class CountrySerializer(serializers.ModelSerializer):
 
         class Meta:
             model = CurrencyHistory
-            fields = ('id', 'name', 'iso', 'sign', 'url', 'date_from', 'date_to')
+            fields = ('id', 'name', 'iso', 'sign',
+                      'url', 'date_from', 'date_to')
 
-    currencies = CurrencyHistorySerializer(many=True, source='currencyhistory_set')
+    currencies = CurrencyHistorySerializer(many=True,
+                                           source='currencyhistory_set')
     url = serializers.HyperlinkedIdentityField(view_name='country-detail')
     current = CurrencySerializer(source='current_currency')
 
     class Meta:
         model = Country
         fields = ('id', 'name', 'iso', 'url', 'currencies', 'current')
+
 
 class CollectionSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField('get_owner_name')

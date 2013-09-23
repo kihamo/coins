@@ -9,6 +9,7 @@ from base64 import b64encode, b64decode
 from hashlib import md5
 from mimetypes import guess_type
 
+
 class DatabaseStorage(DS):
     def __init__(self):
         options = {
@@ -22,7 +23,7 @@ class DatabaseStorage(DS):
         assert mode == 'rb', "DatabaseStorage open mode must be 'rb'."
 
         try:
-            object = Image.objects.get(pk = name)
+            object = Image.objects.get(pk=name)
         except Image.DoesNotExist:
             return None
 
@@ -41,10 +42,10 @@ class DatabaseStorage(DS):
         except Image.DoesNotExist:
             object = Image(
                 pk=hash,
-                filename = name.replace('\\', '/'),
-                size = len(binary),
-                data = b64encode(binary),
-                mime_type = guess_type(name)[0]
+                filename=name.replace('\\', '/'),
+                size=len(binary),
+                data=b64encode(binary),
+                mime_type=guess_type(name)[0]
             )
             object.save()
 

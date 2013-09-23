@@ -13,6 +13,7 @@ And to activate the app index dashboard::
 from django.utils.translation import ugettext_lazy as _
 from admin_tools.dashboard import modules, Dashboard, AppIndexDashboard
 
+
 class CustomIndexDashboard(Dashboard):
     def init_with_context(self, context):
         self.children.append(modules.Group(
@@ -70,7 +71,9 @@ class CustomIndexDashboard(Dashboard):
                 },
                 {
                     'title': _('Collection list in google docs'),
-                    'url': 'https://docs.google.com/a/kihamo.ru/spreadsheet/ccc?key=0AlUZ0Eqd4UJwdEZRTHVWMVFCcW5TX0JqSGh2ZGptS1E&usp=sharing',
+                    'url': 'https://docs.google.com/a/kihamo.ru/spreadsheet/'
+                           'ccc?key=0AlUZ0Eqd4UJwdEZRTHVWM'
+                           'VFCcW5TX0JqSGh2ZGptS1E&usp=sharing',
                     'external': True,
                     'attrs': {'target': '_blank'},
                 }
@@ -86,6 +89,7 @@ class CustomIndexDashboard(Dashboard):
             _('Recent Actions'),
             limit=5
         ))
+
 
 class CustomAppIndexDashboard(AppIndexDashboard):
     title = ''
@@ -134,14 +138,18 @@ class CustomAppIndexDashboard(AppIndexDashboard):
                 _('Links'),
                 children=[
                     {
-                        'title': _('Commemorative and Investment Coins database'),
-                        'url': 'http://cbr.ru/bank-notes_coins/?Prtid=coins_base',
+                        'title': _('Commemorative and '
+                                   'Investment Coins database'),
+                        'url': 'http://cbr.ru/bank-notes_coins/'
+                               '?Prtid=coins_base',
                         'external': True,
                         'attrs': {'target': '_blank'},
                     },
                     {
                         'title': _('Collection list in google docs'),
-                        'url': 'https://docs.google.com/a/kihamo.ru/spreadsheet/ccc?key=0AlUZ0Eqd4UJwdEZRTHVWMVFCcW5TX0JqSGh2ZGptS1E&usp=sharing',
+                        'url': 'https://docs.google.com/a/kihamo.ru/'
+                               'spreadsheet/ccc?key=0AlUZ0Eqd4UJwdEZ'
+                               'RTHVWMVFCcW5TX0JqSGh2ZGptS1E&usp=sharing',
                         'external': True,
                         'attrs': {'target': '_blank'},
                     }

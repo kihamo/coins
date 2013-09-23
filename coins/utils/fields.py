@@ -1,12 +1,15 @@
 from django.db.models.fields.files import ImageFieldFile, ImageField
 from south.modelsinspector import add_introspection_rules
 
+
 class CoinImageFieldFile(ImageFieldFile):
-    def get_url(self, thumb_width = None, thumb_height = None, thumb_format = None):
-        if not thumb_width and hasattr(self.field, 'thumb_width') and self.field.thumb_width > 0:
+    def get_url(self, thumb_width=None, thumb_height=None, thumb_format=None):
+        if (not thumb_width and hasattr(self.field, 'thumb_width') and
+           self.field.thumb_width > 0):
             thumb_width = self.field.thumb_width
 
-        if not thumb_height and hasattr(self.field, 'thumb_height') and self.field.thumb_height > 0:
+        if (not thumb_height and hasattr(self.field, 'thumb_height') and
+           self.field.thumb_height > 0):
             thumb_height = self.field.thumb_height
 
         if not thumb_format and hasattr(self.field, 'thumb_format'):
@@ -22,6 +25,7 @@ class CoinImageFieldFile(ImageFieldFile):
 
         return url
     url = property(get_url)
+
 
 class CoinImageField(ImageField):
     attr_class = CoinImageFieldFile
@@ -40,7 +44,8 @@ class CoinImageField(ImageField):
         self.thumb_height = thumb_height
         self.thumb_format = thumb_format
 
-        super(CoinImageField, self).__init__(verbose_name, name, width_field, height_field, **kwargs)
+        super(CoinImageField, self).__init__(verbose_name, name, width_field,
+                                             height_field, **kwargs)
 
     def generate_filename(self, instance, name):
         return name

@@ -8,6 +8,7 @@ router.register(r'countries', viewsets.CountryViewSet)
 router.register(r'currencies', viewsets.CurrencyViewSet)
 router.register(r'collections', viewsets.CollectionViewSet)
 
-urlpatterns = patterns('coins.views',
+urlpatterns = patterns(
+    'coins.views',
     url(r'^', include(router.urls))
 )

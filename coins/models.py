@@ -467,11 +467,11 @@ class CopyAbstract(CoinAbstract):
     collection = models.ForeignKey(
         Collection,
         verbose_name=_('Collection'),
-        default=lambda: [
+        default=lambda: (
             Collection.objects.count()
             and Collection.objects.all()[0]
             or None
-        ]
+        )
     )
     grade = models.PositiveSmallIntegerField(
         _('Grade'),

@@ -28,6 +28,7 @@ class Command(BaseCommand):
     )
 
     help = 'Scan cbr.ru site'
+    debug = False
     test = False
 
     site_url = 'http://cbr.ru'
@@ -52,7 +53,7 @@ class Command(BaseCommand):
 
     _main_information_mapping = {
         u'каталожный номер': 'catalog_number',
-        u'дата выпуска': 'date_issue'
+        u'дата выпуска': 'date_issue',
     }
     _main_params_mapping = {
         u'сплав': 'alloy',
@@ -65,7 +66,12 @@ class Command(BaseCommand):
     }
     _other_params_mapping = {
         u'оформление гурта': 'desc_edge',
-        u'чеканка': 'mint'
+        u'чеканка': 'mint',
+        u'художник': 'painter',
+        u'художники': 'painter',
+        u'скульптор': 'sculptor',
+        u'скульпторы': 'sculptor',
+        u'художник и скульптор': ('painter', 'sculptor')
     }
     _mint_names_mapping = {
         u'санкт-петергбургский монетный двор':
@@ -88,10 +94,10 @@ class Command(BaseCommand):
         u'московский монетный двор',
     }
 
-    _re_params = re.compile(r'^[\s]*([^:]+?)[\s]*:[\s]*(.+?)[\s.]*$',
+    _re_params = re.compile(r'^\s*([^:]+?)\s*:\s*(.*?)[\s.]*$',
                             re.UNICODE)
-    _re_mint = re.compile(r'[\W]*([^(]+?)\s*\(([^)]+?)(?:\)|$)'
-                          r'(?:\s*[^\d\s.]*\s*([\d\s]+?)\s*([\w]+)[.])?',
+    _re_mint = re.compile(r'\W*([^(]+?)\s*\(([^)]+?)(?:\)|$)'
+                          r'(?:\s*[^\d\s.]*\s*([\d\s]+?)\s*(\w+)[.])?',
                           re.UNICODE)
 
     def __init__(self):
@@ -107,8 +113,6 @@ class Command(BaseCommand):
         urllib2.install_opener(opener)
 
     def _load_url(self, url, data=None):
-        self.stdout.write(self.style.HTTP_INFO('Load page %s' % url))
-
         try:
             if data:
                 data = urlencode(data)
@@ -125,7 +129,6 @@ class Command(BaseCommand):
 
     def _load_image(self, url):
         image_url = '%s%s' % (self.site_url, url)
-        self.stdout.write(self.style.HTTP_INFO('Load image %s' % image_url))
 
         try:
             content = urllib2.urlopen(image_url)
@@ -142,6 +145,7 @@ class Command(BaseCommand):
     def handle(self, year=None, number=None, test=None,
                debug=None, *args, **options):
         self.test = test
+        self.debug = debug
 
         if debug:
             self.urllib_handler.set_http_debuglevel(1)
@@ -332,11 +336,19 @@ class Command(BaseCommand):
                                               % string)
                     else:
                         key = match.group(1).lower().replace('c', u'с')
+                        value = match.group(2)
 
                         if key in self._other_params_mapping:
-                            key = self._other_params_mapping[key]
+                            mapping = self._other_params_mapping[key]
 
-                        info[key] = match.group(2)
+                            if hasattr(mapping, '__iter__'):
+                                for var in mapping:
+                                    info[var] = value
+                            else:
+                                info[mapping] = value
+
+                        else:
+                            self.stderr.write('Unknown attribute "%s"' % key)
 
             # mints
             if 'mintage' in info:
@@ -431,8 +443,6 @@ class Command(BaseCommand):
             not self.test and self._save_coin(info)
 
     def _save_coin(self, info):
-        self.stdout.write('Import coin number %s' % info['catalog_number'])
-
         # save issue
         issue, created = CoinIssue.objects.get_or_create(
             catalog_number=info['catalog_number'],
@@ -445,6 +455,9 @@ class Command(BaseCommand):
                 'year': info['year']
             }
         )
+
+        if created:
+            self.stdout.write('Add coin issue "%s"' % issue.name)
 
         for field in issue._meta.fields:
             if not field.name in info:
@@ -483,8 +496,6 @@ class Command(BaseCommand):
                 if current_value is None or current_value == '':
                     issue.__setattr__(field.name, new_value)
 
-        self.stdout.write('Save %s coin issue "%s"'
-                          % ('new' if created else 'exists', issue.name))
         issue.save()
 
         # save mints

@@ -375,6 +375,18 @@ class CoinIssue(CopyIssueAbstract):
         blank=True,
         null=True
     )
+    painter = models.CharField(
+        _('Painter'),
+        max_length=200,
+        blank=True,
+        null=True
+    )
+    sculptor = models.CharField(
+        _('Sculptor'),
+        max_length=200,
+        blank=True,
+        null=True
+    )
 
     class Meta(CoinAbstract.Meta):
         db_table = 'coins_coin_issues'

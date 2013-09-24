@@ -38,6 +38,7 @@ function create_database()
     fi
 
     $MANAGER syncdb --noinput --all
+    $MANAGER migrate --fake
     echo $0: Creating database finished.
 }
 
@@ -76,6 +77,8 @@ function deploy()
     echo $0: Update source from git finished.
 
     django_refresh
+
+    $MANAGER migrate
 }
 
 ARG=${1:-"-h"}

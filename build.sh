@@ -21,9 +21,6 @@ function create_env()
     export PIP_REQUIRE_VIRTUALENV=true
     $ENV_DIR/bin/pip install --upgrade --requirement=./requirements.txt --log=$BASE_DIR/logs/build_pip_packages.log
 
-    echo $0: Making virtual environment relocatable
-    $VIRTUALENV --relocatable $ENV_DIR
-
     echo $0: Creating virtual environment finished.
 }
 

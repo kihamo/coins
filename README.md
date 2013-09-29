@@ -1,12 +1,20 @@
 ### Установка
+###### Установка Coins
+    # apt-get install python-dev python-virtualenv mercurial libxml2-dev libxslt1-dev gettext
+
     $ git clone git@github.com:kihamo/coins.git /var/www/coins
     $ cd /var/www/coins
     $ ./build.sh -i
 
+###### Настройка Supervisor
+    # apt-get install supervisor
     # ln -si /var/www/coins/supervisor.program.conf /etc/supervisor/conf.d/coinscollection.conf
     # supervisorctl reload
+
+###### Настройка Nginx
+    # apt-get install nginx
     # ln -si /var/www/coins/nginx.host.conf /etc/nginx/sites-enabled/coinscollection.conf
-    # nginx -s reload
+    # nginx -s reload &> /dev/null || nginx
 
 ### Обновление
     $ cd /var/www/coins

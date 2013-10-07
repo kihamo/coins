@@ -330,7 +330,7 @@ class Command(BaseCommand):
                     match = self._re_params.match(string)
                     if not match:
                         if key:
-                            info[key] += '\n%s' % string.strip().strip('.')
+                            value = '\n%s' % string.strip().strip('.')
                         else:
                             self.stderr.write('Error parse other param "%s"'
                                               % string)
@@ -338,17 +338,21 @@ class Command(BaseCommand):
                         key = match.group(1).lower().replace('c', u'с')
                         value = match.group(2)
 
-                        if key in self._other_params_mapping:
-                            mapping = self._other_params_mapping[key]
+                    if key in self._other_params_mapping:
+                        mapping = self._other_params_mapping[key]
 
-                            if hasattr(mapping, '__iter__'):
-                                for var in mapping:
+                        if hasattr(mapping, '__iter__'):
+                            for var in mapping:
+                                if var in info:
+                                    info[var] += value
+                                else:
                                     info[var] = value
-                            else:
-                                info[mapping] = value
-
+                        elif mapping in info:
+                            info[mapping] += value
                         else:
-                            self.stderr.write('Unknown attribute "%s"' % key)
+                            info[mapping] = value
+                    else:
+                        self.stderr.write('Unknown attribute "%s"' % key)
 
             # mints
             if 'mintage' in info:

@@ -66,12 +66,20 @@ class Command(BaseCommand):
     }
     _other_params_mapping = {
         u'оформление гурта': 'desc_edge',
+        u'оформление гуртa': 'desc_edge',
+        u'оформление': 'desc_edge',
+        u'.оформление гурта': 'desc_edge',
         u'чеканка': 'mint',
         u'художник': 'painter',
+        u'худжник': 'painter',
         u'художники': 'painter',
+        u'автор эскиза': 'painter',
         u'скульптор': 'sculptor',
+        u'скуоьптор': 'sculptor',
         u'скульпторы': 'sculptor',
-        u'художник и скульптор': ('painter', 'sculptor')
+        u'художник и скульптор': ('painter', 'sculptor'),
+        u'художник и скульптур': ('painter', 'sculptor'),
+        u'художники и скульпторы': ('painter', 'sculptor'),
     }
     _mint_names_mapping = {
         u'санкт-петергбургский монетный двор':
@@ -97,7 +105,7 @@ class Command(BaseCommand):
     _re_params = re.compile(r'^\s*([^:]+?)\s*:\s*(.*?)[\s.]*$',
                             re.UNICODE)
     _re_mint = re.compile(r'\W*([^(]+?)\s*\(([^)]+?)(?:\)|$)'
-                          r'(?:\s*[^\d\s.]*\s*([\d\s]+?)\s*(\w+)[.])?',
+                          r'(?:\s*[^\d\s.]*\s*([\d\s]+?)\s*(\w+)(?:[.]|$))?',
                           re.UNICODE)
 
     def __init__(self):
@@ -503,7 +511,7 @@ class Command(BaseCommand):
         issue.save()
 
         # save mints
-        if 'mint' in info and not issue.mints.count():
+        if 'mint' in info:
             for mint_info in info['mint']:
                 mint_info['name'] = mint_info['name'].split(':')[-1].strip()
 

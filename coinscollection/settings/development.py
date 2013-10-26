@@ -24,3 +24,13 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.cache.CacheDebugPanel',
     'debug_toolbar.panels.profiling.ProfilingDebugPanel',
 )
+
+LOGGING['handlers']['console'] = {
+    'level': 'DEBUG',
+    'class': 'logging.StreamHandler'
+}
+
+LOGGING['loggers'][''] = {
+    'level': 'DEBUG',
+    'handlers': ['console']
+}

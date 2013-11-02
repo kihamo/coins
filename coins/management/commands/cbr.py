@@ -6,6 +6,7 @@ import pprint
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import color_style
 from django.utils.encoding import force_str
+from decimal import Decimal
 
 from optparse import make_option
 from lxml.etree import parse, HTMLParser
@@ -90,7 +91,7 @@ class Command(BaseCommand):
     }
 
     _re_mint_fast_check = re.compile(
-        ur'\b([СC]П[MМ]Д|[MМ][MМ]Д|Л[MМ]Д|[СC][СC]Д)\b',
+        ur'\b([СC]П[MМ]Д|[MМ][MМ]Д|Л[MМ]Д|[СC][MМ]Д)\b',
         re.I | re.U
     )
     _re_mint = re.compile(
@@ -101,7 +102,7 @@ class Command(BaseCommand):
         r'(?:'
         r'\(([^)]+?)|'
         # ex. 5111-0209
-        ur'\b([СC]П[MМ]Д|[MМ][MМ]Д|Л[MМ]Д|[СC][СC]Д)\b'
+        ur'\b([СC]П[MМ]Д|[MМ][MМ]Д|Л[MМ]Д|[СC][MМ]Д)\b'
         r')(?:\)|$)'
         # mintage
         r'(?:\s*[^\d\s.]*\s*([\d\s]+?)\s*'
@@ -377,7 +378,8 @@ class Command(BaseCommand):
                     raise ParseErrorException('Date issue not found')
 
                 info['date_issue'] = datetime.strptime(info['date_issue'],
-                                                       '%d.%m.%Y')
+                                                       '%d.%m.%Y').date()
+
                 info['year'] = info['date_issue'].year
 
                 # mints
@@ -457,9 +459,8 @@ class Command(BaseCommand):
 
                 # remove double whitespace
                 for key in info:
-                    if isinstance(info[key], type(u'')):
-                        info[key] = re.sub('[ \t\r\f\v]+', ' ',
-                                           info[key].strip('"\''))
+                    if isinstance(info[key], unicode):
+                        info[key] = re.sub('[ \t\r\f\v]+', ' ', info[key])
                         info[key] = re.sub('\n+\s*', '\n', info[key])
 
                 # coin type
@@ -570,18 +571,25 @@ class Command(BaseCommand):
 
                     if created:
                         self._info('Add series "%s"', new_value, level=2)
-                elif field.name in ['diameter', 'thickness', 'weight']:
-                    match = re.match('(^[0-9]+[0-9,.]*[0-9]*).*', new_value[0],
-                                     re.UNICODE)
+
+                elif field.get_internal_type() == 'DecimalField':
+                    if hasattr(new_value, '__iter__'):
+                        new_value = new_value[0]
+
+                    if not isinstance(new_value, unicode):
+                        new_value = unicode(new_value)
+
+                    match = re.match('(^\d+[\d,.]*\d*).*', new_value, re.U)
                     if not match:
                         continue
 
-                    new_value = float(match.group(1).replace(',', '.'))
-                elif type(new_value) is list or type(new_value) is tuple:
+                    new_value = Decimal(match.group(1).replace(',', '.'))
+                elif hasattr(new_value, '__iter__'):
                     new_value = new_value[0]
 
                 current_value = getattr(issue, field.name)
-                if current_value is None or current_value == '':
+
+                if current_value is None or current_value != new_value:
                     issue.__setattr__(field.name, new_value)
 
         issue.save()

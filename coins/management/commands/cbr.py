@@ -3,9 +3,9 @@
 import re
 import pprint
 
-from django.core.management.base import BaseCommand, CommandError
+from coins.management.base import BaseCommand
+from django.core.management.base import CommandError
 from django.core.management.color import color_style
-from django.utils.encoding import force_str
 from decimal import Decimal
 
 from optparse import make_option
@@ -451,7 +451,7 @@ class Command(BaseCommand):
                                          info['mintage'], total,
                                          catalog_number)
                         elif (len(info['mint']) == 1 and
-                              not 'mintage' in info['mint'][0]):
+                              info['mint'][0]['mintage'] is None):
                             info['mint'][0]['mintage'] = info['mintage']
 
                 # descriptions
@@ -488,33 +488,6 @@ class Command(BaseCommand):
                     info[var] += value
                 else:
                     info[var] = value
-
-    def _print_message(self, message, *args, **kwargs):
-        message = force_str(force_str(message) % args)
-
-        std = kwargs['std'] if 'std' in kwargs else self.stderr
-
-        if 'style' in kwargs:
-            message = kwargs['style'](message)
-
-        if not 'level' in kwargs or self.verbosity >= kwargs['level']:
-            std.write(message)
-
-    def _error(self, message, *args, **kwargs):
-        kwargs['style'] = self.style.ERROR
-        self._print_message(message, *args, **kwargs)
-
-    def _notice(self, message, *args, **kwargs):
-        kwargs['style'] = self.style.NOTICE
-        self._print_message(message, *args, **kwargs)
-
-    def _info(self, message, *args, **kwargs):
-        kwargs['std'] = self.stdout
-
-        if not 'level' in kwargs:
-            kwargs['level'] = 1
-
-        self._print_message(message, *args, **kwargs)
 
     def _dump_coin(self, info):
         for key, value in info.items():

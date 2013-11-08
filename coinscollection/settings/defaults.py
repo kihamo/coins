@@ -104,6 +104,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'coins.api.middlewares.ErrorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 )
 
 ROOT_URLCONF = 'coinscollection.urls'
@@ -149,6 +150,7 @@ INSTALLED_APPS = (
     'constance',
     'constance.backends.database',
 
+    'corsheaders',
     'rest_framework',
     'coins',
 )
@@ -213,6 +215,8 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 if USE_I18N:
     TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.i18n',)

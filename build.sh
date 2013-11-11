@@ -73,6 +73,8 @@ function deploy()
 
     echo $0: Update source from git finished.
 
+    $ENV_DIR/bin/pip install --upgrade --requirement requirements.txt
+
     django_refresh
 
     $MANAGER migrate

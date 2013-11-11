@@ -2,9 +2,11 @@
 
 from django.utils.translation import ugettext_lazy as _, ugettext
 
-from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse
 from django.db.models.query import EmptyQuerySet
+
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin
 
 from django.contrib import admin
 from django.forms import ModelForm
@@ -364,6 +366,25 @@ class BanknoteAdmin(CopyAdminAbstract):
         'features'
     )
 
+
+class DeviceTokenInline(admin.TabularInline):
+    model = DeviceToken
+    extra = 0
+    max_num = 0
+    readonly_fields = ('token', )
+    verbose_name = _('Device token')
+    verbose_name_plural = _('Device tokens')
+
+
+class UserAdmin(UserAdmin):
+    class Media:
+        css = {
+            "all": ("admin/css/coins.css",)
+        }
+
+    inlines = (DeviceTokenInline,)
+
+
 admin.site.register(CoinIssue, CoinIssueAdmin)
 admin.site.register(Coin, CoinAdmin)
 admin.site.register(Mint, MintAdmin)
@@ -377,3 +398,6 @@ admin.site.register(Currency, CurrencyAdmin)
 
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Series)
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)

@@ -7,6 +7,7 @@ router.register(r'mints', viewsets.MintViewSet)
 router.register(r'countries', viewsets.CountryViewSet)
 router.register(r'currencies', viewsets.CurrencyViewSet)
 router.register(r'collections', viewsets.CollectionViewSet)
+router.register(r'profile/token', viewsets.DeviceTokenViewSet)
 
 urlpatterns = patterns(
     'coins.views',

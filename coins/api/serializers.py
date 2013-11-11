@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from coins.models import Mint, Currency, CurrencyHistory, Country, Collection
+from coins.models import (Mint, Currency, CurrencyHistory,
+                          Country, Collection, DeviceToken)
 
 
 class MintSerializer(serializers.ModelSerializer):
@@ -74,3 +75,12 @@ class CollectionSerializer(serializers.ModelSerializer):
                 name = obj.owner.username
 
         return name
+
+
+# FIXME: Unique exception
+class DeviceTokenSerializer(serializers.ModelSerializer):
+    user = serializers.Field(source='user.username')
+
+    class Meta:
+        model = DeviceToken
+        fields = ('token', 'created_at')

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: coins\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-24 22:26+0400\n"
+"POT-Creation-Date: 2013-11-12 03:52+0400\n"
 "PO-Revision-Date: 2012-12-26 01:53+0400\n"
 "Last-Translator: Kihamo <infokihamo.ru>\n"
 "Language-Team: Russian <infokihamo.ru>\n"
@@ -39,57 +39,65 @@ msgstr "Страна выпуска по-умолчанию"
 msgid "Default issue currency"
 msgstr "Валюта выпуска по-умолчанию"
 
-#: admin.py:24
+#: admin.py:26
 msgid "Print coin boxes only not packed coins"
 msgstr "Печать боксов только для не упакованных монет"
 
-#: admin.py:30
+#: admin.py:32
 msgid "Print coin boxes for all coins"
 msgstr "Печать боксов для всех монет"
 
-#: admin.py:72
+#: admin.py:74
 msgid "Barcode"
 msgstr "Штрихкод"
 
-#: admin.py:131 models.py:175
+#: admin.py:133 models.py:175
 msgid "Coins count"
 msgstr "Количество монет"
 
-#: admin.py:138 models.py:179
+#: admin.py:140 models.py:179
 msgid "Banknotes count"
 msgstr "Количество банкнот"
 
-#: admin.py:151 models.py:101 models.py:129 models.py:191 models.py:269
+#: admin.py:153 models.py:101 models.py:129 models.py:191 models.py:269
 msgid "Country"
 msgstr "Страна"
 
-#: admin.py:211 admin.py:340 models.py:263
+#: admin.py:213 admin.py:343 models.py:263
 msgid "Nominal"
 msgstr "Номинал"
 
-#: admin.py:221 admin.py:330
+#: admin.py:223 admin.py:333
 msgid "Image"
 msgstr "Изображение"
 
-#: admin.py:233 models.py:290
+#: admin.py:235 models.py:290
 msgid "Catalog number"
 msgstr "Каталожный номер"
 
-#: admin.py:246 admin.py:284
+#: admin.py:248 admin.py:287
 msgid "Main information"
 msgstr "Основная информация"
 
-#: admin.py:257 admin.py:295
+#: admin.py:259 admin.py:298
 msgid "Physical parameters"
 msgstr "Физические параметры"
 
-#: admin.py:264 admin.py:301 models.py:303
+#: admin.py:266 admin.py:304 models.py:303
 msgid "Description"
 msgstr "Описание"
 
-#: admin.py:344 models.py:276
+#: admin.py:347 models.py:276
 msgid "Year"
 msgstr "Год"
+
+#: admin.py:375
+msgid "Device token"
+msgstr "Токен устройства"
+
+#: admin.py:376
+msgid "Device tokens"
+msgstr "Токены устройства"
 
 #: dashboard.py:20 dashboard.py:102 models.py:469
 msgid "Collection"
@@ -199,7 +207,7 @@ msgstr "Дата окончания действия"
 msgid "Collection name"
 msgstr "Название коллекции"
 
-#: models.py:163
+#: models.py:163 models.py:605
 msgid "User"
 msgstr "Пользователь"
 
@@ -442,3 +450,11 @@ msgstr "банкнота"
 #: models.py:599
 msgid "banknotes"
 msgstr "банкноты"
+
+#: models.py:608
+msgid "Token"
+msgstr "Токен"
+
+#: models.py:611 models.py:612
+msgid "Create date"
+msgstr "Дата создания"

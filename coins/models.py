@@ -597,3 +597,24 @@ class Banknote(CopyAbstract):
         unique_together = ('album', 'page', 'division')
         verbose_name = _('banknote')
         verbose_name_plural = _('banknotes')
+
+
+class DeviceToken(models.Model):
+    user = models.ForeignKey(
+        User,
+        verbose_name=_('User')
+    )
+    token = models.TextField(
+        _('Token')
+    )
+    created_at = models.DateTimeField(
+        _('Create date'),
+        help_text=_('Create date'),
+        auto_now_add=True
+    )
+
+    class Meta:
+        unique_together = ('user', 'token')
+
+    def __unicode__(self):
+        return self.token

@@ -1,0 +1,7 @@
+#devicetoken_set-group td.original p {
+  visibility: hidden
+}
+
+#devicetoken_set-group .tabular tr.has_original td {
+    padding-top: 1em;
+}

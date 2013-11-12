@@ -607,6 +607,12 @@ class DeviceToken(models.Model):
     token = models.TextField(
         _('Token')
     )
+    device = models.CharField(
+        _('Device name'),
+        max_length=100,
+        blank=True,
+        null=True
+    )
     created_at = models.DateTimeField(
         _('Create date'),
         help_text=_('Create date'),

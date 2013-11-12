@@ -83,4 +83,4 @@ class DeviceTokenSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DeviceToken
-        fields = ('token', 'created_at')
+        fields = ('device', 'token', 'created_at')

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: coins\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-12 03:52+0400\n"
+"POT-Creation-Date: 2013-11-12 22:01+0400\n"
 "PO-Revision-Date: 2012-12-26 01:53+0400\n"
 "Last-Translator: Kihamo <infokihamo.ru>\n"
 "Language-Team: Russian <infokihamo.ru>\n"
@@ -455,6 +455,10 @@ msgstr "банкноты"
 msgid "Token"
 msgstr "Токен"
 
-#: models.py:611 models.py:612
+#: models.py:611
+msgid "Device name"
+msgstr "Название устройства"
+
+#: models.py:617 models.py:618
 msgid "Create date"
 msgstr "Дата создания"

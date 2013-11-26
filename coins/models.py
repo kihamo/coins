@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
+from django.conf import settings
 from coins.utils.fields import CoinImageField
 
 
@@ -159,7 +160,7 @@ class Collection(CoinAbstract):
         help_text=_('Collection name')
     )
     owner = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         verbose_name=_('User'),
         blank=True,
         null=True
@@ -601,7 +602,7 @@ class Banknote(CopyAbstract):
 
 class DeviceToken(models.Model):
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         verbose_name=_('User')
     )
     token = models.TextField(

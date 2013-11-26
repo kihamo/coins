@@ -151,7 +151,10 @@ INSTALLED_APPS = (
     'constance.backends.database',
 
     'corsheaders',
+
     'rest_framework',
+    'rest_framework.authtoken',
+
     'coins',
 )
 
@@ -214,6 +217,9 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.UnicodeJSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
 }
 
 CORS_ORIGIN_ALLOW_ALL = True

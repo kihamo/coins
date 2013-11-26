@@ -14,6 +14,7 @@ from django.forms import ModelForm
 from utils.widgets import AdminImageFileWidget
 from models import *
 
+from rest_framework.authtoken.models import Token
 from constance import config
 
 # -------- Actions --------
@@ -376,13 +377,18 @@ class DeviceTokenInline(admin.TabularInline):
     verbose_name_plural = _('Device tokens')
 
 
+class ApiTokenInline(admin.TabularInline):
+    model = Token
+    verbose_name = _('Api authentication token')
+    verbose_name_plural = _('Api authentication tokens')
+
 class UserAdmin(UserAdmin):
     class Media:
         css = {
-            "all": ("admin/css/coins.css",)
+            'all': ('admin/css/coins.css',)
         }
 
-    inlines = (DeviceTokenInline,)
+    inlines = (DeviceTokenInline, ApiTokenInline)
 
 
 admin.site.register(CoinIssue, CoinIssueAdmin)
@@ -400,4 +406,6 @@ admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Series)
 
 admin.site.unregister(User)
+admin.site.unregister(Token)
+
 admin.site.register(User, UserAdmin)

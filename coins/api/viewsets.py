@@ -1,9 +1,7 @@
 from rest_framework import viewsets, mixins
-from rest_framework.viewsets import generics
-from rest_framework.permissions import IsAuthenticated
 
 import serializers
-from coins.models import Mint, Country, Currency, Collection, DeviceToken
+from coins.models import Mint, Country, Currency, Collection
 
 
 class MintViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -30,12 +28,3 @@ class CurrencyViewSet(viewsets.ReadOnlyModelViewSet):
 class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Collection.objects.select_related('owner')
     serializer_class = serializers.CollectionSerializer
-
-
-class DeviceTokenViewSet(viewsets.ViewSetMixin, generics.CreateAPIView):
-    model = DeviceToken
-    serializer_class = serializers.DeviceTokenSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def pre_save(self, obj):
-        obj.user = self.request.user

@@ -1,8 +1,8 @@
 # Django apps
 Django>=1.6
 django-database-storage>=0.1.2
-django-picklefield>=0.3.0
-South>=0.8.2
+django-picklefield>=0.3.1
+South>=0.8.4
 docutils>=0.11
 django-debug-toolbar>=0.11.0
 djangorestframework>=2.3.9

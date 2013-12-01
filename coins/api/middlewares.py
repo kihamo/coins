@@ -1,4 +1,5 @@
 from django import http
+from django.core.urlresolvers import reverse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import exceptions
@@ -6,6 +7,9 @@ import exceptions
 
 class ErrorsMiddleware(object):
     def process_response(self, request, response):
+        if request.path.startswith(reverse('admin:index')):
+            return response
+
         if not isinstance(response, Response):
             @api_view([request.method])
             def error(request, response):

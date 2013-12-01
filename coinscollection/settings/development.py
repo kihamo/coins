@@ -25,6 +25,13 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.profiling.ProfilingDebugPanel',
 )
 
+REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] = (
+    'rest_framework.renderers.BrowsableAPIRenderer',
+) + REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES']
+REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] = (
+    'rest_framework.authentication.SessionAuthentication',
+) + REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES']
+
 LOGGING['handlers']['console'] = {
     'level': 'DEBUG',
     'class': 'logging.StreamHandler'

@@ -215,7 +215,6 @@ DEBUG_TOOLBAR_CONFIG = {
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.UnicodeJSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',

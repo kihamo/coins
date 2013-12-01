@@ -1,9 +1,18 @@
 #devicetoken_set-group td.original p,
 #auth_token-group  td.original p {
-  visibility: hidden
+    visibility: hidden;
 }
 
 #devicetoken_set-group .tabular tr.has_original td,
 #auth_token-group .tabular tr.has_original td {
     padding-top: 1em;
+}
+
+.field-show_catalog_number .field-show_catalog_number label {
+    display: none;
+}
+
+.field-show_catalog_number .field-show_catalog_number p {
+    margin: 0;
+    padding-left: 0;
 }

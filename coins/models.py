@@ -291,8 +291,7 @@ class CopyIssueAbstract(CoinAbstract):
         _('Catalog number'),
         max_length=100,
         blank=True,
-        null=True,
-        editable=False
+        null=True
     )
     mintage = models.IntegerField(
         _('Total mintage'),

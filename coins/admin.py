@@ -204,6 +204,11 @@ class CopyIssueAdminAbstract(CoinAbstractModelAdmin):
     search_fields = ('name', 'catalog_number')
     readonly_fields = ('show_catalog_number',)
 
+    class Media:
+        css = {
+            'all': ('admin/css/coins.css',)
+        }
+
     def show_nominal(self, model):
         if model.currency.sign:
             return '%g %s' % (model.nominal, model.currency.sign)
@@ -230,14 +235,16 @@ class CopyIssueAdminAbstract(CoinAbstractModelAdmin):
                    'Base_of_memorable_coins/ShowCoins.aspx' \
                    '?cat_num=%s" target="_blank" />%s</a>'\
                    % (model.catalog_number, model.catalog_number)
+        elif model.catalog_number:
+            return model.catalog_number
 
-        return model.catalog_number
+        return ''
     show_catalog_number.allow_tags = True
     show_catalog_number.short_description = _('Catalog number')
 
 
 class CoinIssueAdminForm(CopyIssueAdminForm):
-    class Meta:
+    class Meta(CopyIssueAdminForm.Meta):
         model = CoinIssue
 
 
@@ -253,7 +260,7 @@ class CoinIssueAdmin(CopyIssueAdminAbstract):
                 ('nominal', 'type'),
                 ('country', 'currency'),
                 ('year', 'date_issue'),
-                ('series', 'show_catalog_number'),
+                ('series', 'catalog_number', 'show_catalog_number'),
                 ('mintage')
             )
         }),
@@ -277,7 +284,7 @@ class CoinIssueAdmin(CopyIssueAdminAbstract):
 
 
 class BanknoteIssueAdminForm(CopyIssueAdminForm):
-    class Meta:
+    class Meta(CopyIssueAdminForm.Meta):
         model = BanknoteIssue
 
 

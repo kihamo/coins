@@ -19,5 +19,5 @@ urlpatterns = patterns(
         'box'
     ),
     url(r'^$', TemplateView.as_view(template_name='index.html')),
-    url(r'^', include('coins.api.urls'))
+    url(r'^api/', include('coins.api.urls'))
 )

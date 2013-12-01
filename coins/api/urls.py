@@ -25,5 +25,7 @@ if ('rest_framework.authentication.SessionAuthentication'
         in settings.REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES']):
     urlpatterns += patterns(
         '',
-        url(r'^auth/', include('rest_framework.urls', namespace='rest_framework'))
+        url(r'^auth/', include(
+            'rest_framework.urls',
+            namespace='rest_framework'))
     )

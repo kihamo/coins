@@ -258,6 +258,7 @@ class CopySetAbstract(CoinAbstract):
     class Meta(CoinAbstract.Meta):
         abstract = True
 
+
 class CopyIssueAbstract(CoinAbstract):
     class Meta:
         abstract = True

@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand as DjangoBaseCommand
 from django.utils.encoding import force_str
 
+
 class BaseCommand(DjangoBaseCommand):
     def __init__(self):
         super(BaseCommand, self).__init__()

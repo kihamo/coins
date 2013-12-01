@@ -421,6 +421,7 @@ class ApiTokenInline(admin.TabularInline):
     verbose_name = _('Api authentication token')
     verbose_name_plural = _('Api authentication tokens')
 
+
 class UserAdmin(UserAdmin):
     class Media:
         css = {

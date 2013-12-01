@@ -20,7 +20,10 @@ class DeviceTokenView(APIView):
                 user=self.request.user,
                 defaults={'device': serializer.object.device}
             )
-            return Response(status=status.HTTP_201_CREATED if created
-                   else status.HTTP_200_OK)
+
+            if created:
+                return Response(status=status.HTTP_201_CREATED)
+            else:
+                return Response(status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

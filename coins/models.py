@@ -1,8 +1,6 @@
-# django-tastypie REST Django
 # http://www.falshivok.net/numismatics/Benin/35 coins params
 
 from django.db import models
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
 from django.conf import settings
@@ -239,6 +237,27 @@ class Series(CoinAbstract):
         ordering = ['name']
 
 
+class CopySetAbstract(CoinAbstract):
+    name = models.CharField(
+        _('Name'),
+        help_text=_('Set name'),
+        max_length=200
+    )
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_('User'),
+        blank=True,
+        null=True
+    )
+    image = CoinImageField(
+        _('Image'),
+        blank=True,
+        null=True
+    )
+
+    class Meta(CoinAbstract.Meta):
+        abstract = True
+
 class CopyIssueAbstract(CoinAbstract):
     class Meta:
         abstract = True
@@ -334,10 +353,23 @@ class CopyIssueAbstract(CoinAbstract):
     copy_booked_count.short_description = _('Booked')
 
 
+class CoinSet(CopySetAbstract):
+    class Meta(CoinAbstract.Meta):
+        db_table = 'coins_coin_sets'
+        verbose_name = _('coin set')
+        verbose_name_plural = _('coin sets')
+
+
 class CoinIssue(CopyIssueAbstract):
     mints = models.ManyToManyField(
         Mint,
         through='IssueMint'
+    )
+    sets = models.ManyToManyField(
+        CoinSet,
+        verbose_name=_('Set'),
+        blank=True,
+        null=True,
     )
     diameter = models.DecimalField(
         _('Diameter'),
@@ -398,7 +430,20 @@ class CoinIssue(CopyIssueAbstract):
         self._model_set = self.coin_set
 
 
+class BanknoteSet(CopySetAbstract):
+    class Meta(CoinAbstract.Meta):
+        db_table = 'coins_banknote_sets'
+        verbose_name = _('banknote set')
+        verbose_name_plural = _('banknote sets')
+
+
 class BanknoteIssue(CopyIssueAbstract):
+    sets = models.ManyToManyField(
+        BanknoteSet,
+        verbose_name=_('Set'),
+        blank=True,
+        null=True,
+    )
     weight = models.DecimalField(
         _('Weight'),
         help_text=_('Weight in millimetrs'),

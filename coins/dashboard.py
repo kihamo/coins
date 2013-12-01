@@ -23,6 +23,7 @@ class CustomIndexDashboard(Dashboard):
                 modules.AppList(
                     title=_('Coins'),
                     models=(
+                        'coins.models.CoinSet',
                         'coins.models.CoinIssue',
                         'coins.models.Coin',
                         'coins.models.Mint',
@@ -32,6 +33,7 @@ class CustomIndexDashboard(Dashboard):
                 modules.AppList(
                     title=_('Banknotes'),
                     models=(
+                        'coins.models.BanknoteSet'
                         'coins.models.BanknoteIssue',
                         'coins.models.Banknote',
                     )

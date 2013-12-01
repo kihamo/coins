@@ -59,6 +59,20 @@ class CurrencyHistoryInline(admin.TabularInline):
     extra = 1
 
 
+class CopyIssueInline(admin.TabularInline):
+    extra = 1
+    verbose_name = _('Issue')
+    verbose_name_plural = _('Issues')
+
+
+class CoinIssueInline(CopyIssueInline):
+    model = CoinIssue.sets.through
+
+
+class BanknoteIssueInline(CopyIssueInline):
+    model = BanknoteIssue.sets.through
+
+
 class CopyInline(admin.StackedInline):
     extra = 1
     readonly_fields = ('barcode', 'qr_code')
@@ -196,6 +210,12 @@ class CopyIssueAdminForm(ModelForm):
         super(CopyIssueAdminForm, self).__init__(*args, **kwargs)
 
 
+class CopySetAdminAbstract(CoinAbstractModelAdmin):
+    list_display = ('image', 'name', 'owner')
+    list_display_links = ('name',)
+    search_fields = ('name',)
+
+
 class CopyIssueAdminAbstract(CoinAbstractModelAdmin):
     list_display = ('show_image', 'name', 'show_nominal',
                     'year', 'copy_count', 'copy_booked_count')
@@ -243,6 +263,10 @@ class CopyIssueAdminAbstract(CoinAbstractModelAdmin):
     show_catalog_number.short_description = _('Catalog number')
 
 
+class CoinSetAdmin(CopySetAdminAbstract):
+    inlines = (CoinIssueInline,)
+
+
 class CoinIssueAdminForm(CopyIssueAdminForm):
     class Meta(CopyIssueAdminForm.Meta):
         model = CoinIssue
@@ -252,6 +276,7 @@ class CoinIssueAdmin(CopyIssueAdminAbstract):
     form = CoinIssueAdminForm
     inlines = (IssueMintInline, CoinInline)
     actions = (print_boxes_not_packed, print_boxes_all)
+    filter_horizontal = ('sets',)
     fieldsets = (
         (_('Main information'), {
             'classes': ('wide',),
@@ -261,7 +286,8 @@ class CoinIssueAdmin(CopyIssueAdminAbstract):
                 ('country', 'currency'),
                 ('year', 'date_issue'),
                 ('series', 'catalog_number', 'show_catalog_number'),
-                ('mintage')
+                'mintage',
+                'sets'
             )
         }),
         (_('Physical parameters'), {
@@ -283,6 +309,10 @@ class CoinIssueAdmin(CopyIssueAdminAbstract):
     )
 
 
+class BanknoteSetAdmin(CopySetAdminAbstract):
+    inlines = (BanknoteIssueInline,)
+
+
 class BanknoteIssueAdminForm(CopyIssueAdminForm):
     class Meta(CopyIssueAdminForm.Meta):
         model = BanknoteIssue
@@ -291,6 +321,7 @@ class BanknoteIssueAdminForm(CopyIssueAdminForm):
 class BanknoteIssueAdmin(CopyIssueAdminAbstract):
     form = BanknoteIssueAdminForm
     inlines = (BanknoteInline,)
+    filter_horizontal = ('sets',)
     fieldsets = (
         (_('Main information'), {
             'classes': ('wide',),
@@ -300,7 +331,8 @@ class BanknoteIssueAdmin(CopyIssueAdminAbstract):
                 ('country', 'currency'),
                 ('year', 'date_issue'),
                 ('series', 'show_catalog_number'),
-                ('mintage')
+                'mintage',
+                'sets'
             )
         }),
         (_('Physical parameters'), {
@@ -397,12 +429,13 @@ class UserAdmin(UserAdmin):
 
     inlines = (DeviceTokenInline, ApiTokenInline)
 
-
+admin.site.register(CoinSet, CoinSetAdmin)
 admin.site.register(CoinIssue, CoinIssueAdmin)
 admin.site.register(Coin, CoinAdmin)
 admin.site.register(Mint, MintAdmin)
 admin.site.register(MintMark, MintMarkAdmin)
 
+admin.site.register(BanknoteSet, BanknoteSetAdmin)
 admin.site.register(BanknoteIssue, BanknoteIssueAdmin)
 admin.site.register(Banknote, BanknoteAdmin)
 

@@ -104,7 +104,7 @@ class CoinInline(CopyInline):
             if mint_field.queryset.count():
                 mint_field.initial = mint_field.queryset[0].id
         else:
-            mint_field.queryset = EmptyQuerySet()
+            mint_field.queryset = IssueMint.objects.none()
 
         return formset
 

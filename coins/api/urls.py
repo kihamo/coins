@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.conf.urls import patterns, url, include
 from rest_framework.routers import DefaultRouter
-from rest_framework.authtoken.views import obtain_auth_token
 import viewsets
 import views
 
@@ -15,8 +14,7 @@ urlpatterns = patterns(
     'coins.views',
     url(r'^', include(router.urls)),
     url(r'^user/token', views.DeviceTokenView.as_view()),
-    # http://stackoverflow.com/questions/14567586/token-authentication-for-restful-api-should-the-token-be-periodically-changed
-    url(r'^user/login', obtain_auth_token)
+    url(r'^user/login', views.AuthTokenView.as_view())
 )
 
 if ('rest_framework.authentication.SessionAuthentication'

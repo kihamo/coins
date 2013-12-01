@@ -217,7 +217,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.UnicodeJSONRenderer',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        'coins.api.authentication.TokenAuthentication',
     )
 }
 

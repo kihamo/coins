@@ -3,7 +3,6 @@
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from django.core.urlresolvers import reverse
-from django.db.models.query import EmptyQuerySet
 
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
@@ -420,6 +419,7 @@ class ApiTokenInline(admin.TabularInline):
     model = Token
     verbose_name = _('Api authentication token')
     verbose_name_plural = _('Api authentication tokens')
+    readonly_fields = ('created', )
 
 
 class UserAdmin(UserAdmin):

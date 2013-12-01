@@ -77,7 +77,6 @@ class CollectionSerializer(serializers.ModelSerializer):
         return name
 
 
-# FIXME: Unique exception
 class DeviceTokenSerializer(serializers.ModelSerializer):
     user = serializers.Field(source='user.username')
 

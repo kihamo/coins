@@ -10,7 +10,7 @@ SERVER_EMAIL = 'coins@kihamo.ru'
 DEFAULT_FROM_EMAIL = SERVER_EMAIL
 
 ADMINS = (
-    ('Kihamo', SERVER_EMAIL)
+    ('Kihamo', SERVER_EMAIL),
 )
 
 MANAGERS = ADMINS
@@ -96,12 +96,14 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.common.BrokenLinkEmailsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+
     # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.middleware.clickjacking.XFrameOptionsMiddleware'
 
     'coins.api.middlewares.ErrorsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -198,8 +200,6 @@ LOGGING = {
         },
     }
 }
-
-SEND_BROKEN_LINK_EMAILS = True
 
 INTERNAL_IPS = ('127.0.0.1',)
 ALLOWED_HOSTS = ['*']

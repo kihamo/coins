@@ -428,6 +428,7 @@ class ApiTokenInline(admin.TabularInline):
         opts.get_field('key').verbose_name = _('Token')
         opts.get_field('created').verbose_name = _('Last login date')
 
+
 class UserAdmin(UserAdmin):
     class Media:
         css = {

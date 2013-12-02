@@ -1,5 +1,5 @@
 import os
-from django.utils.translation import ugettext_lazy as _
+from coins.settings import *
 
 PROJECT_PATH = os.path.realpath(os.path.join(__file__, '..', '..'))
 ROOT_PATH = os.path.abspath(os.path.dirname(PROJECT_PATH))
@@ -169,10 +169,6 @@ CACHES = {
 }
 
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
-CONSTANCE_CONFIG = {
-    'DEFAULT_ISSUE_COUNTRY': ('RUS', _('Default issue country')),
-    'DEFAULT_ISSUE_CURRENCY': ('RUB', _('Default issue currency')),
-}
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

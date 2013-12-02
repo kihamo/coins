@@ -1,5 +1,6 @@
 import datetime
 from django.utils.timezone import utc
+from constance import config
 from rest_framework import exceptions
 from rest_framework.authentication import TokenAuthentication \
     as DefaultTokenAuthentication
@@ -16,7 +17,9 @@ class TokenAuthentication(DefaultTokenAuthentication):
             raise exceptions.AuthenticationFailed('User inactive or deleted')
 
         utc_now = datetime.datetime.utcnow().replace(tzinfo=utc)
-        if token.created < utc_now - datetime.timedelta(hours=24):
+        lifetime = config.API_TOKEN_LIFETIME
+
+        if token.created < utc_now - datetime.timedelta(minutes=lifetime):
             raise exceptions.AuthenticationFailed('Token has expired')
 
         return (token.user, token)

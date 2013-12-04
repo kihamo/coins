@@ -6,10 +6,10 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, viewsets
 
-from coins.models import DeviceToken
-from serializers import DeviceTokenSerializer
+from coins.models import DeviceToken, CoinSet, BanknoteSet
+from serializers import *
 
 
 class DeviceTokenView(APIView):
@@ -48,3 +48,49 @@ class AuthTokenView(ObtainAuthToken):
 
             return Response({'token': token.key})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CoinSetViewSet(viewsets.ModelViewSet):
+    serializer_class = CoinSetSerializer
+    model = CoinSet
+
+
+class BanknoteSetViewSet(viewsets.ModelViewSet):
+    serializer_class = BanknoteSetSerializer
+    model = BanknoteSet
+
+
+'''
+class CountryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Country.objects \
+                      .select_related('current_currency') \
+                      .prefetch_related('currencyhistory_set') \
+                      .prefetch_related('currencyhistory_set__currency') \
+                      .order_by('iso')
+    serializer_class = serializers.CountrySerializer
+
+class MintViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Mint.objects.select_related('country').prefetch_related('marks')
+    serializer_class = serializers.MintSerializer
+
+
+class CountryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Country.objects \
+                      .select_related('current_currency') \
+                      .prefetch_related('currencyhistory_set') \
+                      .prefetch_related('currencyhistory_set__currency') \
+                      .order_by('iso')
+    serializer_class = serializers.CountrySerializer
+
+
+class CurrencyViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Currency.objects \
+                       .prefetch_related('countries') \
+                       .order_by('iso')
+    serializer_class = serializers.CurrencySerializer
+
+
+class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Collection.objects.select_related('owner')
+    serializer_class = serializers.CollectionSerializer
+'''

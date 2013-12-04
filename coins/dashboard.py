@@ -33,7 +33,7 @@ class CustomIndexDashboard(Dashboard):
                 modules.AppList(
                     title=_('Banknotes'),
                     models=(
-                        'coins.models.BanknoteSet'
+                        'coins.models.BanknoteSet',
                         'coins.models.BanknoteIssue',
                         'coins.models.Banknote',
                     )

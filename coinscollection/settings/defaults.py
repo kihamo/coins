@@ -208,16 +208,5 @@ DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False
 }
 
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.UnicodeJSONRenderer',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'coins.api.authentication.TokenAuthentication',
-    )
-}
-
-CORS_ORIGIN_ALLOW_ALL = True
-
 if USE_I18N:
     TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.i18n',)

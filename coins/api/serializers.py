@@ -1,8 +1,7 @@
 from rest_framework import serializers
-from coins.models import (Mint, Currency, CurrencyHistory,
-                          Country, Collection, DeviceToken)
+from coins.models import DeviceToken, CoinSet, BanknoteSet
 
-
+'''
 class MintSerializer(serializers.ModelSerializer):
     country = serializers.Field(source='country.name')
     marks = serializers.RelatedField(many=True)
@@ -75,6 +74,7 @@ class CollectionSerializer(serializers.ModelSerializer):
                 name = obj.owner.username
 
         return name
+'''
 
 
 class DeviceTokenSerializer(serializers.ModelSerializer):
@@ -83,3 +83,13 @@ class DeviceTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeviceToken
         fields = ('device', 'token', 'created_at')
+
+
+class CoinSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoinSet
+
+
+class BanknoteSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BanknoteSet
